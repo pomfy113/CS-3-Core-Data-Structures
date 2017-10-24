@@ -9,6 +9,8 @@ import string
 # string.ascii_letters is ascii_lowercase + ascii_uppercase
 # string.printable is digits + ascii_letters + punctuation + whitespace
 
+def letters(number):
+    number
 
 def decode(digits, base):
     """Decode given digits in given base to number in base 10.
@@ -17,8 +19,20 @@ def decode(digits, base):
     return: int -- integer representation of number (in base 10)"""
     # Handle up to base 36 [0-9a-z]
     assert 2 <= base <= 36, 'base is out of range: {}'.format(base)
+    total = 0
+
+    fulldigit = list(digits)
+
+    for value, digit in enumerate(digits):
+        if digit.isalpha():
+            number = ord(digit)-55
+            total += number * (base**(len(fulldigit)-value-1))
+        else:
+            total += int(digit) * (base**(len(fulldigit)-value-1))
+    print(total)
+
     # TODO: Decode digits from binary (base 2)
-    # ...
+
     # TODO: Decode digits from hexadecimal (base 16)
     # ...
     # TODO: Decode digits from any base (2 up to 36)
@@ -34,6 +48,26 @@ def encode(number, base):
     assert 2 <= base <= 36, 'base is out of range: {}'.format(base)
     # Handle unsigned numbers only for now
     assert number >= 0, 'number is negative: {}'.format(number)
+
+    total = ""
+
+    for i in range(128):
+        tempdigit = number
+        result = tempdigit // (base**(i+1))
+        print(base**(i+1), "fits in", number, result, "times.")
+
+        if result == 0:
+            for j in range(i, -1, -1):
+                print("Checking", base**j)
+                newresult = divmod(tempdigit, base**j)
+                tempdigit = newresult[1]
+                if newresult[0] >= 10:
+                    total = total+chr(87+(newresult[0]))
+                else:
+                    total = total+(newresult[0])
+                print(total)
+            break
+    return total.upper()
     # TODO: Encode number in binary (base 2)
     # ...
     # TODO: Encode number in hexadecimal (base 16)
@@ -72,6 +106,12 @@ def main():
         # Convert given digits between bases
         result = convert(digits, base1, base2)
         print('{} in base {} is {} in base {}'.format(digits, base1, result, base2))
+    if len(args) == 2:
+        digits = args[0]
+        base1 = int(args[1])
+        result = decode(digits, base1)
+        # print('{} in base 10 is {} in base {}'.format(digits, result, base1))
+
     else:
         print('Usage: {} digits base1 base2'.format(sys.argv[0]))
         print('Converts digits from base1 to base2')
