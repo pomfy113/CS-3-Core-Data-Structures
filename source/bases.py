@@ -21,22 +21,17 @@ def decode(digits, base):
     assert 2 <= base <= 36, 'base is out of range: {}'.format(base)
     total = 0
 
+    # List of all digits
     fulldigit = list(digits)
 
     for value, digit in enumerate(digits):
         if digit.isalpha():
-            number = ord(digit)-55
+            number = ord(digit)-87
             total += number * (base**(len(fulldigit)-value-1))
+            # Put error checking here; not within range of base
         else:
             total += int(digit) * (base**(len(fulldigit)-value-1))
-    print(total)
-
-    # TODO: Decode digits from binary (base 2)
-
-    # TODO: Decode digits from hexadecimal (base 16)
-    # ...
-    # TODO: Decode digits from any base (2 up to 36)
-    # ...
+    return total
 
 
 def encode(number, base):
@@ -50,30 +45,23 @@ def encode(number, base):
     assert number >= 0, 'number is negative: {}'.format(number)
 
     total = ""
+    count = 0
 
-    for i in range(128):
-        tempdigit = number
-        result = tempdigit // (base**(i+1))
-        print(base**(i+1), "fits in", number, result, "times.")
-
+    # how far do we go?
+    while True:
+        result = number // (base**(count+1))
         if result == 0:
-            for j in range(i, -1, -1):
-                print("Checking", base**j)
-                newresult = divmod(tempdigit, base**j)
-                tempdigit = newresult[1]
-                if newresult[0] >= 10:
-                    total = total+chr(87+(newresult[0]))
-                else:
-                    total = total+(newresult[0])
-                print(total)
             break
-    return total.upper()
-    # TODO: Encode number in binary (base 2)
-    # ...
-    # TODO: Encode number in hexadecimal (base 16)
-    # ...
-    # TODO: Encode number in any base (2 up to 36)
-    # ...
+        count += 1
+    for i in range(count, -1, -1):
+        newresult = divmod(number, base**i)
+        number = newresult[1]
+
+        if newresult[0] >= 10:
+            total = total+chr(87+(newresult[0]))
+        else:
+            total = total+(str(newresult[0]))
+    return total
 
 
 def convert(digits, base1, base2):
@@ -85,14 +73,9 @@ def convert(digits, base1, base2):
     # Handle up to base 36 [0-9a-z]
     assert 2 <= base1 <= 36, 'base1 is out of range: {}'.format(base1)
     assert 2 <= base2 <= 36, 'base2 is out of range: {}'.format(base2)
-    # TODO: Convert digits from base 2 to base 16 (and vice versa)
-    # ...
-    # TODO: Convert digits from base 2 to base 10 (and vice versa)
-    # ...
-    # TODO: Convert digits from base 10 to base 16 (and vice versa)
-    # ...
-    # TODO: Convert digits from any base to any base (2 up to 36)
-    # ...
+
+    decodedresult = decode(digits, base1)
+    return encode(decodedresult, base2)
 
 
 def main():
@@ -107,9 +90,9 @@ def main():
         result = convert(digits, base1, base2)
         print('{} in base {} is {} in base {}'.format(digits, base1, result, base2))
     if len(args) == 2:
-        digits = args[0]
+        digits = int(args[0])
         base1 = int(args[1])
-        result = decode(digits, base1)
+        result = encode(digits, base1)
         # print('{} in base 10 is {} in base {}'.format(digits, result, base1))
 
     else:
