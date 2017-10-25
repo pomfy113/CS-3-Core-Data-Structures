@@ -74,15 +74,32 @@ def convert(digits, base1, base2):
     assert 2 <= base1 <= 36, 'base1 is out of range: {}'.format(base1)
     assert 2 <= base2 <= 36, 'base2 is out of range: {}'.format(base2)
 
-    decodedresult = decode(digits, base1)
-    return encode(decodedresult, base2)
+    total = 0
+    finaltally = ""
+    digits = list(digits)
 
+    for value, number in enumerate(digits):
+        if number.isalpha():
+            digits[value] = ord(number) - 87
+
+    for number in digits:
+        total = (base1 * total) + int(number)
+
+    while total > 0:
+        remainder = total % base2
+        if remainder >= 10:
+            remainder = chr(87 + remainder)
+        finaltally = str(remainder) + finaltally
+        total = total // base2
+
+    return finaltally
 
 def main():
     """Read command-line arguments and convert given digits between bases."""
     import sys
     args = sys.argv[1:]  # Ignore script file name
     if len(args) == 3:
+        print("Working on it")
         digits = args[0]
         base1 = int(args[1])
         base2 = int(args[2])
