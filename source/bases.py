@@ -9,6 +9,11 @@ import string
 # string.ascii_letters is ascii_lowercase + ascii_uppercase
 # string.printable is digits + ascii_letters + punctuation + whitespace
 
+# We default to lcase for printing
+UCASE_ASCII = 55
+LCASE_ASCII = 87
+BASE_DIGITS = string.digits + string.ascii_letters
+
 def decode(digits, base):
     """Decode given digits in given base to number in base 10.
     digits: str -- string representation of number (in given base)
@@ -18,12 +23,21 @@ def decode(digits, base):
     assert 2 <= base <= 36, 'base is out of range: {}'.format(base)
     total = 0
 
-    # List of all digits
+    # Turn digits into lists
     digits = list(digits)
-    #
+
+    # Keep adding up the digits to build up proper number representation
+    # If letter, turn it into corresponding number
+    # CURRENT CHECKS: upper or lower, if too high for base (using 3 in base3)
     for number in digits:
-        if number.isalpha():
-            number = ord(number)-87
+        if number not in BASE_DIGITS:
+            raise ValueError("'{}' is an illegal character.".format(number))
+        if str(number).islower():
+            number = ord(number) - LCASE_ASCII
+        if str(number).isupper():
+            number = ord(number) - UCASE_ASCII
+        if int(number) >= base:
+            raise ValueError("Input must be within the base's limit!")
         total = (base * total) + int(number)
 
     return total
@@ -39,15 +53,17 @@ def encode(number, base):
     # Handle unsigned numbers only for now
     assert number >= 0, 'number is negative: {}'.format(number)
 
-    total = number
     finaltally = ""
 
-    while total > 0:
-        remainder = total % base
+    # Keep dividing number further and further
+    # Each time, add the result to a final string of digits
+    # Do this until there is no remainder
+    while number > 0:
+        remainder = number % base
         if remainder >= 10:
-            remainder = chr(87 + remainder)
+            remainder = chr(LCASE_ASCII + remainder)
         finaltally = str(remainder) + finaltally
-        total = total // base
+        number = number // base
 
     return finaltally
 
@@ -63,6 +79,8 @@ def convert(digits, base1, base2):
     assert 2 <= base1 <= 36, 'base1 is out of range: {}'.format(base1)
     assert 2 <= base2 <= 36, 'base2 is out of range: {}'.format(base2)
 
+    # I tried my best to go from one base directly to another
+    # It didn't work. I'll just do this for now.
     return encode(decode(digits, base1), base2)
 
 def main():
@@ -70,7 +88,6 @@ def main():
     import sys
     args = sys.argv[1:]  # Ignore script file name
     if len(args) == 3:
-        print("Working on it")
         digits = args[0]
         base1 = int(args[1])
         base2 = int(args[2])

@@ -268,4 +268,3 @@ class BasesConvertTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    print("Time taken:", time.time())
