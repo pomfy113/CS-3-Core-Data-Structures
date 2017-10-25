@@ -9,9 +9,6 @@ import string
 # string.ascii_letters is ascii_lowercase + ascii_uppercase
 # string.printable is digits + ascii_letters + punctuation + whitespace
 
-def letters(number):
-    number
-
 def decode(digits, base):
     """Decode given digits in given base to number in base 10.
     digits: str -- string representation of number (in given base)
@@ -22,15 +19,13 @@ def decode(digits, base):
     total = 0
 
     # List of all digits
-    fulldigit = list(digits)
+    digits = list(digits)
+    #
+    for number in digits:
+        if number.isalpha():
+            number = ord(number)-87
+        total = (base * total) + int(number)
 
-    for value, digit in enumerate(digits):
-        if digit.isalpha():
-            number = ord(digit)-87
-            total += number * (base**(len(fulldigit)-value-1))
-            # Put error checking here; not within range of base
-        else:
-            total += int(digit) * (base**(len(fulldigit)-value-1))
     return total
 
 
@@ -44,24 +39,18 @@ def encode(number, base):
     # Handle unsigned numbers only for now
     assert number >= 0, 'number is negative: {}'.format(number)
 
-    total = ""
-    count = 0
+    total = number
+    finaltally = ""
 
-    # how far do we go?
-    while True:
-        result = number // (base**(count+1))
-        if result == 0:
-            break
-        count += 1
-    for i in range(count, -1, -1):
-        newresult = divmod(number, base**i)
-        number = newresult[1]
+    while total > 0:
+        remainder = total % base
+        if remainder >= 10:
+            remainder = chr(87 + remainder)
+        finaltally = str(remainder) + finaltally
+        total = total // base
 
-        if newresult[0] >= 10:
-            total = total+chr(87+(newresult[0]))
-        else:
-            total = total+(str(newresult[0]))
-    return total
+    return finaltally
+
 
 
 def convert(digits, base1, base2):
@@ -74,25 +63,7 @@ def convert(digits, base1, base2):
     assert 2 <= base1 <= 36, 'base1 is out of range: {}'.format(base1)
     assert 2 <= base2 <= 36, 'base2 is out of range: {}'.format(base2)
 
-    total = 0
-    finaltally = ""
-    digits = list(digits)
-
-    for value, number in enumerate(digits):
-        if number.isalpha():
-            digits[value] = ord(number) - 87
-
-    for number in digits:
-        total = (base1 * total) + int(number)
-
-    while total > 0:
-        remainder = total % base2
-        if remainder >= 10:
-            remainder = chr(87 + remainder)
-        finaltally = str(remainder) + finaltally
-        total = total // base2
-
-    return finaltally
+    return encode(decode(digits, base1), base2)
 
 def main():
     """Read command-line arguments and convert given digits between bases."""
@@ -106,12 +77,6 @@ def main():
         # Convert given digits between bases
         result = convert(digits, base1, base2)
         print('{} in base {} is {} in base {}'.format(digits, base1, result, base2))
-    if len(args) == 2:
-        digits = int(args[0])
-        base1 = int(args[1])
-        result = encode(digits, base1)
-        # print('{} in base 10 is {} in base {}'.format(digits, result, base1))
-
     else:
         print('Usage: {} digits base1 base2'.format(sys.argv[0]))
         print('Converts digits from base1 to base2')
