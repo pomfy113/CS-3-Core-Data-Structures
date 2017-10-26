@@ -54,7 +54,6 @@ def encode(number, base):
     assert number >= 0, 'number is negative: {}'.format(number)
 
     finaltally = ""
-
     # Keep dividing number further and further
     # Each time, add the result to a final string of digits
     # Do this until there is no remainder
