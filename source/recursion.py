@@ -18,8 +18,6 @@ def factorial_iterative(n):
     while num != n+1:
         total = total * num
         num += 1
-        print(total)
-
     return total
 
     # once implemented, change factorial (above) to call factorial_iterative
