@@ -24,12 +24,11 @@ def decode(digits, base):
     total = 0
 
     # Turn digits into lists
-    digits = list(digits)
 
     # Keep adding up the digits to build up proper number representation
     # If letter, turn it into corresponding number
     # CURRENT CHECKS: upper or lower, if too high for base (using 3 in base3)
-    for number in digits:
+    for number in list(digits):
         if number not in BASE_DIGITS:
             raise ValueError("'{}' is an illegal character.".format(number))
         if str(number).islower():

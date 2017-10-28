@@ -13,10 +13,9 @@ def factorial(n):
 
 
 def factorial_iterative(n):
-    # TODO: implement the factorial function iteratively here
     num = total = 1
     while num != n+1:
-        total = total * num
+        total *= num
         num += 1
     return total
 

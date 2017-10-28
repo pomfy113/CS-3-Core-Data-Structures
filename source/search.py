@@ -13,6 +13,18 @@ def linear_search_iterative(array, item):
     for index, value in enumerate(array):
         if item == value:
             return index  # found
+    # # 2
+    # index = 0
+    # for value in array:
+    #     if item == value:
+    #         return index  # found
+    #     index += 1
+    #     index = index+1
+    # # 3
+    # # for(int index = 0; index < len(array); index++)
+    # for index in range(len(array)):
+    #     if array[index] == item:
+    #         return index  # found
     return None  # not found
 
 
@@ -20,15 +32,21 @@ def linear_search_recursive(array, item, index=0):
     # If you've gone too far, it's not in there
     if index >= len(array):
         return None
-    # If it matches, return index
+    # If it matches, return
     if array[index] == item:
         return index
     # You uh... you add 1 to the index
-    index += 1
-    return linear_search_recursive(array, item, index)
+    return linear_search_recursive(array, item, index+1)
+    # ^^^ SUPERIOR CODE ^^^
 
-    # once implemented, change linear_search to call linear_search_recursive
-    # to verify that your recursive implementation passes all tests
+    # temparray = array[index:]
+    # if len(array) == 0:
+    #     return None
+    # if array[0] == item:
+    #     return 0
+    #
+    # return 1 + linear_search_recursive(array[1:], item)
+
 
 
 def binary_search(array, item):
@@ -37,7 +55,6 @@ def binary_search(array, item):
     # change this to call your implementation to verify it passes all tests
     return binary_search_recursive(array, item)
     # return binary_search_recursive(array, item)
-
 
 def binary_search_iterative(array, item):
     # TODO: implement binary search iteratively here
@@ -68,24 +85,30 @@ def binary_search_iterative(array, item):
 
 
 def binary_search_recursive(array, item, left=None, right=None):
-    # Only run at beginning
+    # Only run at beginning;
     if(left is None) and (right is None):
         left = 0
         right = len(array)-1
     # Index for the middle element
-    middleindex = left + ((right - left) // 2)
-    # If it's smack dab in the middle, return that
+    middleindex = (left + right) // 2
+    # If it's the middle, return that
     if item == array[middleindex]:
         return middleindex
-    # If it's down to the last two elements, check both
-    # If it's not in either, then it's not there
+    # = = = = = = ALTERNATE = = = = =
+    # If it hasn't been found at this point, it's not there
+    # if right == left:
+    #     return None
+    # = = = = = = ALTERNATE = = = = =
+
     if right - left <= 2:
-        if item == array[left]:
+        if array[left] == item:
             return left
-        elif item == array[right]:
+        elif array[right] == item:
             return right
         return None
-    # Otherwise, we check if it's left/right of middle and cut where it's not
+
+    # If it's on the right half, cut the left half and vice versa
+    # IF ALT: change to (middleindex+1, right) and (middleindex-1, left)
     elif item > array[middleindex]:
         return binary_search_recursive(array, item, middleindex, right)
     elif item < array[middleindex]:
