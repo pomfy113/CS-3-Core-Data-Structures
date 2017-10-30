@@ -6,6 +6,26 @@ def contains(text, pattern):
     assert isinstance(pattern, str), 'pattern is not a string: {}'.format(text)
     # TODO: Implement contains here (iteratively and/or recursively)
 
+    pattern = list(pattern)
+    p_len = len(pattern)
+
+    clean_text = list(filter(str.isalnum, text))
+    t_len = len(clean_text)
+
+    print("Searching contains")
+    for i in range(t_len):
+        # If the first letter matches, check the rest of string
+        if clean_text[i] == pattern[0]:
+
+            for j in range(p_len):
+                if i+j >= t_len:
+                    return False
+                if pattern[j] != clean_text[i+j]:
+                    break
+                if j == p_len-1:
+                    return True
+
+    return False
 
 def find_index(text, pattern):
     """Return the starting index of the first occurrence of pattern in text,
@@ -26,12 +46,13 @@ def find_all_indexes(text, pattern):
 def test_string_algorithms(text, pattern):
     found = contains(text, pattern)
     print('contains({!r}, {!r}) => {}'.format(text, pattern, found))
-    # TODO: Uncomment these lines after you implement find_index
-    index = find_index(text, pattern)
-    print('find_index({!r}, {!r}) => {}'.format(text, pattern, index))
-    # TODO: Uncomment these lines after you implement find_all_indexes
-    indexes = find_all_indexes(text, pattern)
-    print('find_all_indexes({!r}, {!r}) => {}'.format(text, pattern, indexes))
+
+    # # TODO: Uncomment these lines after you implement find_index
+    # index = find_index(text, pattern)
+    # print('find_index({!r}, {!r}) => {}'.format(text, pattern, index))
+    # # TODO: Uncomment these lines after you implement find_all_indexes
+    # indexes = find_all_indexes(text, pattern)
+    # print('find_all_indexes({!r}, {!r}) => {}'.format(text, pattern, indexes))
 
 
 def main():
