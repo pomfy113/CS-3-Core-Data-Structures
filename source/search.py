@@ -85,31 +85,34 @@ def binary_search_iterative(array, item):
 
 
 def binary_search_recursive(array, item, left=None, right=None):
+    """Cuts array in half to check for item in array."""
+    """Must be sorted; left/right are respective margins."""
     # Only run at beginning;
-    if(left is None) and (right is None):
+    if (left is None) and (right is None):
         left = 0
         right = len(array)-1
     # Index for the middle element
+    if right < left:
+        return None
     middleindex = (left + right) // 2
+    middle_item = array[middleindex]
     # If it's the middle, return that
-    if item == array[middleindex]:
+    if item == middle_item:
         return middleindex
     # = = = = = = ALTERNATE = = = = =
-    # If it hasn't been found at this point, it's not there
-    # if right == left:
+    # if right - left <= 2:
+    #     if array[left] == item:
+    #         return left
+    #     elif array[right] == item:
+    #         return right
     #     return None
     # = = = = = = ALTERNATE = = = = =
 
-    if right - left <= 2:
-        if array[left] == item:
-            return left
-        elif array[right] == item:
-            return right
-        return None
+    # If it hasn't been found at this point, it's not there
 
     # If it's on the right half, cut the left half and vice versa
-    # IF ALT: change to (middleindex+1, right) and (middleindex-1, left)
-    elif item > array[middleindex]:
-        return binary_search_recursive(array, item, middleindex, right)
-    elif item < array[middleindex]:
-        return binary_search_recursive(array, item, left, middleindex)
+    # IF ALT: remove the +1 and -1 from middle index
+    elif item > middle_item:
+        return binary_search_recursive(array, item, middleindex+1, right)
+    elif item < middle_item:
+        return binary_search_recursive(array, item, left, middleindex-1)

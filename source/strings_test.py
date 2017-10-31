@@ -76,7 +76,9 @@ class StringsTest(unittest.TestCase):
         assert find_index('abra cadabra', 'adab') == 6  # overlapping prefix
         # TODO: Write more test cases that check complex patterns or edge cases
         # You'll need a lot more than this to test your algorithm's robustness
-        # ...
+        assert find_index('a.dab', 'adab') == 0  # with periods
+        assert find_index('b a b c d', 'abc') == 2  # with multispace
+
 
     def test_find_all_indexes_with_matching_patterns(self):
         # Positive test cases (examples) with matching patterns

@@ -32,11 +32,9 @@ def is_palindrome_iterative(text):
 def is_palindrome_recursive(text, left=None, right=None):
     # Assuming first time checking; would check right too, but
     # Sets up both ends and removing alphanums
-    if (left is None):
-        text = list(filter(str.isalnum, text.lower()))
+    if (left is None) and (right is None):
         left = 0
         right = len(text)-1
-    print(left, right)
     # Check if left overtakes right (equals still count)
     # If so, stop
     if left > right:
