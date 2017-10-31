@@ -177,6 +177,28 @@ class LinkedListTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             ll.delete('X')  # item not in list
 
+    def test_double(self):
+        """The reversed linked list makes use of previous nodes"""
+        """Reversed LinkedList which uses prev to traverse should work."""
+        ll = LinkedList(['A', 'B', 'C'])
+        assert ll.rev_items()[0] == 'C'
+        assert ll.rev_items()[1] == 'B'
+        assert ll.rev_items()[2] == 'A'
+        ll.delete('A')
+        assert ll.rev_items()[1] == 'B'
+        with self.assertRaises(IndexError):
+            ll.rev_items()[2] == None
+        ll.insert_at_index(0, "A")
+        ll.insert_at_index(3, "D")
+        assert ll.rev_items()[0] == 'D'
+        ll.delete('B')
+        assert ll.rev_items()[1] == 'C'
+        assert ll.rev_items()[2] == 'A'
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
