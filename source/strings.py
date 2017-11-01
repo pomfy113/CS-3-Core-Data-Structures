@@ -61,8 +61,8 @@ def find_index(text, pattern):
                 shift += p_len - pattern.index(text[shift+p_len-1]) - 1
             else:
                 shift += p_len
-    # ALTERNATE SOLUTION - if you care about ignoring periods/don't like
-    #
+    # # ALTERNATE SOLUTION - if you care about ignoring periods/don't like
+    # #
     # for i in range(t_len):
     #     # If the first letter matches, check the rest of string
     #     # Worst case O(n) + size of pattern; best case, size of pattern
@@ -110,8 +110,6 @@ def find_all_indexes(text, pattern):
     # Making sure that shift doesn't go past point of no return
     # You can't find 'def' in 'abcd' if you're already past b
     while(shift <= t_len - p_len):
-        print("Loop start!", text[shift:])
-
         # We can only do it to the length of pattern
         index = p_len - 1
         # Keep going until it all meets
@@ -123,8 +121,10 @@ def find_all_indexes(text, pattern):
             shift += 1
         else:
             # Otherwise, if it's in the pattern, move pattern to match
-            if text[shift+p_len-1] in pattern:
-                shift += p_len - pattern.index(text[shift+p_len-1]) - 1
+            # Boyer-Moore says we should use the last letter for best results
+            lastletter = text[shift+p_len-1]
+            if lastletter in pattern:
+                shift += p_len - pattern.index(lastletter) - 1
             # Otherwise, shift as far as the length
             else:
                 shift += p_len
