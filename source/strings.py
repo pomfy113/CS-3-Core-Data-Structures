@@ -43,22 +43,42 @@ def find_index(text, pattern):
     text = list(text)
     t_len = len(text)
 
-    for i in range(t_len):
-        # If the first letter matches, check the rest of string
-        # Worst case O(n) + size of pattern; best case, size of pattern
-        if text[i] == pattern[0]:
-            foundindex = i
-            skip = 0
-            # Gradually goes through pattern by index
-            for j in range(p_len):
-                if i+j+skip > t_len-1:
-                    return None
-                while not text[i+j+skip].isalnum():
-                    skip += 1
-                if pattern[j] != text[i+j+skip]:
-                    break
-                if j == p_len-1:
-                    return foundindex
+    shift = 0
+    # Alternate way I read about: Boyer-Moore
+    # Making sure that shift doesn't go past point of no return
+    # You can't find 'def' in 'abcd' if you're already past b
+    while(shift <= t_len - p_len):
+        # We can only do it to the length of pattern
+        index = p_len - 1
+        # Keep going until it all meets
+        while index >= 0 and pattern[index] == text[shift+index]:
+            index -= 1
+        # If we get past index, then return where the shift is
+        if index < 0:
+            return shift
+        else:
+            if text[shift+p_len-1] in pattern:
+                shift += p_len - pattern.index(text[shift+p_len-1]) - 1
+            else:
+                shift += p_len
+    # ALTERNATE SOLUTION - if you care about ignoring periods/don't like
+    #
+    # for i in range(t_len):
+    #     # If the first letter matches, check the rest of string
+    #     # Worst case O(n) + size of pattern; best case, size of pattern
+    #     if text[i] == pattern[0]:
+    #         foundindex = i
+    #         skip = 0
+    #         # Gradually goes through pattern by index
+    #         for j in range(p_len):
+    #             if i+j+skip > t_len-1:
+    #                 return None
+    #             while not text[i+j+skip].isalnum():
+    #                 skip += 1
+    #             if pattern[j] != text[i+j+skip]:
+    #                 break
+    #             if j == p_len-1:
+    #                 return foundindex
     return None
 
 
@@ -85,28 +105,53 @@ def find_all_indexes(text, pattern):
 
     foundindeces = []
 
-    for i in range(t_len):
-        # If the first letter matches, check the rest of string
-        # Worst: O(n^2 if it's always matching)
-        # Best: O(n) where nothing matches
-        if text[i] == pattern[0]:
-            foundindex = i
-            skip = 0
-            # Loop for going through pattern as a list
-            for j in range(p_len):
-                # Too far into text; stop right there
-                if i+j+skip > t_len-1:
-                    break
-                # If it's not alphanumeric, skip to the next element
-                while not text[i+j+skip].isalnum():
-                    skip += 1
-                # If that element doesn't match, it's not a full match
-                if pattern[j] != text[i+j+skip]:
-                    break
-                # Found if go through all of pattern; append to list
-                if j == p_len-1:
-                    foundindeces.append(foundindex)
+    shift = 0
+    # Alternate way I read about: Boyer-Moore
+    # Making sure that shift doesn't go past point of no return
+    # You can't find 'def' in 'abcd' if you're already past b
+    while(shift <= t_len - p_len):
+        print("Loop start!", text[shift:])
 
+        # We can only do it to the length of pattern
+        index = p_len - 1
+        # Keep going until it all meets
+        while index >= 0 and pattern[index] == text[shift+index]:
+            index -= 1
+        # If we get past index, then shift up a bit and append to list
+        if index < 0:
+            foundindeces.append(shift)
+            shift += 1
+        else:
+            # Otherwise, if it's in the pattern, move pattern to match
+            if text[shift+p_len-1] in pattern:
+                shift += p_len - pattern.index(text[shift+p_len-1]) - 1
+            # Otherwise, shift as far as the length
+            else:
+                shift += p_len
+
+    # Alternate; works with non alphanum
+    # for i in range(t_len):
+    #     # If the first letter matches, check the rest of string
+    #     # Worst: O(n^2 if it's always matching)
+    #     # Best: O(n) where nothing matches
+    #     if text[i] == pattern[0]:
+    #         foundindex = i
+    #         skip = 0
+    #         # Loop for going through pattern as a list
+    #         for j in range(p_len):
+    #             # Too far into text; stop right there
+    #             if i+j+skip > t_len-1:
+    #                 break
+    #             # If it's not alphanumeric, skip to the next element
+    #             while not text[i+j+skip].isalnum():
+    #                 skip += 1
+    #             # If that element doesn't match, it's not a full match
+    #             if pattern[j] != text[i+j+skip]:
+    #                 break
+    #             # Found if go through all of pattern; append to list
+    #             if j == p_len-1:
+    #                 foundindeces.append(foundindex)
+    #
     return foundindeces
 
 

@@ -50,8 +50,11 @@ class StringsTest(unittest.TestCase):
         assert find_index('abc', 'abc') == 0  # all strings contain themselves
         assert find_index('aaa', 'a') == 0  # multiple occurrences
         assert find_index('aaa', 'aa') == 0  # overlapping pattern
-        # TODO: Write more positive test cases with assert equal int statements
-        # ...
+        assert find_index('123', '') == 0
+        assert find_index('123', '1') == 0
+        assert find_index('123', '2') == 1
+        assert find_index('123', '3') == 2
+        assert find_index('123', '123') == 0
 
     def test_find_index_with_non_matching_patterns(self):
         # Negative test cases (counterexamples) with non-matching patterns
@@ -60,7 +63,7 @@ class StringsTest(unittest.TestCase):
         assert find_index('abc', 'az') is None  # first letter, but not last
         assert find_index('abc', 'abz') is None  # first 2 letters, but not last
         # TODO: Write more negative test cases with assert is None statements
-        # ...
+        assert find_index('123', '4') is None
 
     def test_find_index_with_complex_patterns(self):
         # Difficult test cases (examples) with complex patterns
@@ -76,8 +79,11 @@ class StringsTest(unittest.TestCase):
         assert find_index('abra cadabra', 'adab') == 6  # overlapping prefix
         # TODO: Write more test cases that check complex patterns or edge cases
         # You'll need a lot more than this to test your algorithm's robustness
-        assert find_index('a.dab', 'adab') == 0  # with periods
-        assert find_index('b a b c d', 'abc') == 2  # with multispace
+        assert find_index('a.d.ab', 'a.d.ab') == 0  # with periods
+        assert find_index('b abc d', 'abc') == 2
+        assert find_index(' b abc d', 'abc') == 3  # with multispace
+        assert find_index('.....abc', 'abc') == 5
+        assert find_index('a-bc', 'a-bc') == 0
 
 
     def test_find_all_indexes_with_matching_patterns(self):
