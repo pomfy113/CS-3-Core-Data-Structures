@@ -84,6 +84,9 @@ class StringsTest(unittest.TestCase):
         assert find_index(' b abc d', 'abc') == 3  # with multispace
         assert find_index('.....abc', 'abc') == 5
         assert find_index('a-bc', 'a-bc') == 0
+        assert find_index('aaaaaaaaab', 'aaaaaaaab') == 1
+
+
 
 
     def test_find_all_indexes_with_matching_patterns(self):
