@@ -269,20 +269,35 @@ class LinkedList(object):
             # Otherwise raise an error to tell the user that delete has failed
             raise ValueError('Item not found: {}'.format(item))
 
-    def dequeue(self):
-        """Delete the front of queue."""
+    def remove_tail(self):
+        """Delete the tail specifically."""
         # The one before the tail now points to None
         # Tail is now the previous; return front
-        front = self.tail
-        if front.prev is not None:
-            front.prev.next = None
-            self.tail = front.prev
+        oldtail = self.tail
+        if oldtail.prev is not None:
+            oldtail.prev.next = None
+            self.tail = oldtail.prev
             self.size -= 1
         # If it's the last element, it's cleared.
         else:
             self.head = self.tail = None
             self.size -= 1
-        return front.data
+        return oldtail.data
+
+    def remove_head(self):
+        """Delete the head specifically."""
+        # The one after the head's prev now leads to nothing
+        #
+        oldhead = self.head
+        if oldhead.next is not None:
+            oldhead.next.prev = None
+            self.head = oldhead.next
+            self.size -= 1
+        # If it's the last element, it's cleared.
+        else:
+            self.head = self.tail = None
+            self.size -= 1
+        return oldhead.data
 
 
 def test_linked_list():
