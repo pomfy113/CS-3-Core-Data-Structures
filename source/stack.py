@@ -83,7 +83,7 @@ class ArrayStack(object):
     def push(self, item):
         """Insert the given item on the top of this stack.
         Running time: O(1) – Putting something on top of list is O(1)"""
-        self.list.insert(self.length(), item)
+        self.list.append(item)
 
     def peek(self):
         """Return the item on the top of this stack without removing it,
@@ -101,7 +101,10 @@ class ArrayStack(object):
         size = self.length()
         if size == 0:
             raise ValueError
-        return self.list.pop((size-1))
+        lastitem = self.peek()
+        size = self.length()
+        del self.list[(size-1)]
+        return lastitem
         # TODO: Remove and return top item, if any
 
 
