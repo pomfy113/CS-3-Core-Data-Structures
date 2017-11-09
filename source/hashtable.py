@@ -139,6 +139,8 @@ class HashTable(object):
             bucket.delete(entry)
         else:  # Not found
             raise KeyError('Key not found: {}'.format(key))
+        if self.load_factor() < 0.30:
+            self._resize(0)
 
     def _resize(self, new_size=None):
         """Resize this hash table's buckets and rehash all key-value entries.
@@ -152,18 +154,19 @@ class HashTable(object):
         # Option to reduce size if buckets are sparsely filled (low load factor)
         elif new_size is 0:
             new_size = len(self.buckets) / 2  # Half size
-        # TODO: Get a list to temporarily hold all current key-value entries
+
+        # Get a list to temporarily hold all current key-value entries
         templist = self.buckets
-        # TODO: Create a new list of new_size total empty linked list buckets
-        self.buckets = [LinkedList() for i in range(new_size)]
-        # TODO: Insert each key-value entry into the new list of buckets,
+        # Create a new list of new_size total empty linked list buckets
+        self.buckets = [LinkedList() for i in range(int(new_size))]
+        # Insert each key-value entry into the new list of buckets,
         for oldbucket in templist:
             node = oldbucket.head
             for i in range(oldbucket.size):
                 index = self._bucket_index(node.data[0])
                 bucket = self.buckets[index]
 
-                bucket.append((node.data[0], node.data[1]))
+                bucket.append(node.data)
                 node = node.next
 
 
@@ -200,6 +203,8 @@ def test_hash_table():
     print('get(L): ' + str(ht.get('L')))
     print('contains(X): ' + str(ht.contains('X')))
     print('contains(Z): ' + str(ht.contains('Z')))
+    print(ht, "\n\n")
+
 
     print('Deleting entries:')
     ht.delete('I')
@@ -215,6 +220,7 @@ def test_hash_table():
     print('length: ' + str(ht.length()))
     print('buckets: ' + str(len(ht.buckets)))
     print('load_factor: ' + str(ht.load_factor()))
+    print(ht)
 
 
 if __name__ == '__main__':
