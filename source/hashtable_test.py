@@ -18,11 +18,11 @@ class HashTableTest(unittest.TestCase):
         ht.set('I', 1)
         assert ht.keys() == ['I']
         ht.set('V', 5)
-        self.assertItemsEqual(ht.keys(), ['I', 'V'])  # Ignore item order
+        self.assertCountEqual(ht.keys(), ['I', 'V'])  # Ignore item order
         # Python 3 unittest module renamed this assertion method
         # self.assertCountEqual(ht.keys(), ['I', 'V'])  # Ignore item order
         ht.set('X', 10)
-        self.assertItemsEqual(ht.keys(), ['I', 'V', 'X'])  # Ignore item order
+        self.assertCountEqual(ht.keys(), ['I', 'V', 'X'])  # Ignore item order
         # Python 3 unittest module renamed this assertion method
         # self.assertCountEqual(ht.keys(), ['I', 'V', 'X'])  # Ignore item order
 
@@ -32,11 +32,11 @@ class HashTableTest(unittest.TestCase):
         ht.set('I', 1)
         assert ht.values() == [1]
         ht.set('V', 5)
-        self.assertItemsEqual(ht.values(), [1, 5])  # Ignore item order
+        self.assertCountEqual(ht.values(), [1, 5])  # Ignore item order
         # Python 3 unittest module renamed this assertion method
         # self.assertCountEqual(ht.values(), [1, 5])  # Ignore item order
         ht.set('X', 10)
-        self.assertItemsEqual(ht.values(), [1, 5, 10])  # Ignore item order
+        self.assertCountEqual(ht.values(), [1, 5, 10])  # Ignore item order
         # Python 3 unittest module renamed this assertion method
         # self.assertCountEqual(ht.values(), [1, 5, 10])  # Ignore item order
 
@@ -46,11 +46,11 @@ class HashTableTest(unittest.TestCase):
         ht.set('I', 1)
         assert ht.items() == [('I', 1)]
         ht.set('V', 5)
-        self.assertItemsEqual(ht.items(), [('I', 1), ('V', 5)])
+        self.assertCountEqual(ht.items(), [('I', 1), ('V', 5)])
         # Python 3 unittest module renamed this assertion method
         # self.assertCountEqual(ht.items(), [('I', 1), ('V', 5)])
         ht.set('X', 10)
-        self.assertItemsEqual(ht.items(), [('I', 1), ('V', 5), ('X', 10)])
+        self.assertCountEqual(ht.items(), [('I', 1), ('V', 5), ('X', 10)])
         # Python 3 unittest module renamed this assertion method
         # self.assertCountEqual(ht.items(), [('I', 1), ('V', 5), ('X', 10)])
 
@@ -131,6 +131,7 @@ class HashTableTest(unittest.TestCase):
         assert ht.get('I') == 1
         assert ht.get('V') == 5
         assert ht.get('X') == 10
+        print(ht.length(), ht.size)
         assert ht.length() == 3  # Check length is not overcounting
         assert ht.size == 3  # Check size is not overcounting
 
