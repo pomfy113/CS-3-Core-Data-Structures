@@ -70,10 +70,10 @@ class CircularBuffer(object):
         """For debugging purposes."""
         return self.buffer
 
-test = CircularBuffer()
-for i in range(20):
-    test.queue(i)
-    print(test.orderedrep())
+# test = CircularBuffer()
+# for i in range(20):
+#     test.queue(i)
+#     print(test.orderedrep())
 
 
 # test = CircularBuffer()
