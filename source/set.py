@@ -15,11 +15,7 @@ from hashtable import HashTable
 class Set(object):
     def __init__(self, elements=None):
         # If I want a perfect O(n), I'll need... linear collision check?
-        if elements is None:
-            initsize = 5
-        else:
-            initsize = len(elements)
-        self.data = HashTable(initsize)
+        self.data = HashTable()
         for item in elements:
             if self.data.contains(item):
                 continue
@@ -37,21 +33,32 @@ class Set(object):
         return self.data.size
 
     def contains(self, element):
+        """Checks if element is inside set
+        O(1) near head of bucket.
+        O(n) where n=elements in bucket."""
         return self.data.contains(element)
 
     def add(self, element):
-        if self.contains(element):
-            return
-        else:
-            self.data.set(element, None)
+        """Adds element to set.
+        O(1) at the head, O(n) due to use ht.find in set.
+        Due to how set works (update as needed), no need for contains"""
+        self.data.set(element, None)
 
     def remove(self, element):
+        """Removes element from set.
+        Raise value error if not available
+
+        O(1) if at head, O(n) at tail
+        Delete is still the same; lt -> ht
+        The added "contains" makes it run slower though
+        """
         if self.contains(element):
             self.data.delete(element)
         else:
             raise ValueError
     def union(self, other_set):
-        """Return a new set that is a union of this set and other_set"""
+        """Return a new set that is a union of this set and other_set.
+        O(n); goes through every item and has contains"""
         newset = self.contents()
         for item in other_set.contents():
             if self.contains(item):
@@ -61,7 +68,8 @@ class Set(object):
         return Set(newset)
 
     def intersection(self, other_set):
-        """Return a new set that is an intersection of this set + other_set."""
+        """Return a new set that is an intersection of this set + other_set.
+        O(n); goes through every item and has contains"""
         newset = []
         for item in other_set.contents():
             if self.contains(item):
@@ -69,7 +77,8 @@ class Set(object):
         return Set(newset)
 
     def is_subset(self, other_set):
-        """Return a boolean whether other set is a subset of this set."""
+        """Return a boolean whether other set is a subset of this set.
+        O(n). It's like the above, with an additional comparison"""
 
         # Check to make sure if everything in THIS set is in the other
         if self.size() <= other_set.size():
@@ -81,11 +90,11 @@ class Set(object):
             return True
         else:
             return False
-
-test1 = Set([6, 7, 8, 9, 10])
-test2 = Set([1, 2, 3, 4, 5])
-result = test1.intersection(test2)
-print(result)
+# 
+# test1 = Set([6, 7, 8, 9, 10])
+# test2 = Set([1, 2, 3, 4, 5])
+# result = test1.intersection(test2)
+# print(result)
 # test2 = Set([4, 5, 6, 7, 8])
 #
 # print(test)

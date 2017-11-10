@@ -126,9 +126,6 @@ class SetTest(unittest.TestCase):
         assert result.contains('D') is True
         assert result.contains('E') is False
 
-
-
-
     def test_subset(self):
         # Should be false; two overlapping
         test1 = Set([1, 2, 3, 4, 5])
