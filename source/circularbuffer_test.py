@@ -63,7 +63,21 @@ class CircularBufferTest(unittest.TestCase):
         assert cb.read == 1
         assert cb.dequeue() == 1
 
-
+        # Let's keep dequeueing
+        assert cb.dequeue() == 2
+        assert cb.dequeue() == 3
+        assert cb.dequeue() == 4
+        assert cb.dequeue() == 5
+        assert cb.dequeue() == 6
+        assert cb.dequeue() == 7
+        assert cb.dequeue() == 8
+        assert cb.dequeue() == 9
+        assert cb.dequeue() == 10
+        assert cb.dequeue() == 11
+        assert cb.dequeue() is None
+        assert cb.dequeue() is None
+        assert cb.read == 11
+        assert cb.write == 0
 
 if __name__ == '__main__':
     unittest.main()

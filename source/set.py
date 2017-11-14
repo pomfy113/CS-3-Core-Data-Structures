@@ -56,6 +56,7 @@ class Set(object):
             self.data.delete(element)
         else:
             raise ValueError
+
     def union(self, other_set):
         """Return a new set that is a union of this set and other_set.
         O(n); goes through every item and has contains"""
@@ -79,7 +80,6 @@ class Set(object):
     def is_subset(self, other_set):
         """Return a boolean whether other set is a subset of this set.
         O(n). It's like the above, with an additional comparison"""
-
         # Check to make sure if everything in THIS set is in the other
         if self.size() <= other_set.size():
             for item in self.contents():
@@ -90,7 +90,7 @@ class Set(object):
             return True
         else:
             return False
-# 
+#
 # test1 = Set([6, 7, 8, 9, 10])
 # test2 = Set([1, 2, 3, 4, 5])
 # result = test1.intersection(test2)

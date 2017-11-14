@@ -76,6 +76,7 @@ class SetTest(unittest.TestCase):
         test2 = Set([4, 5, 6, 7, 8])
         result = test1.intersection(test2)
         assert result.contents() == [4, 5]
+        assert test1.contents() == [1, 2, 3, 4, 5]
         # If same, just in case
         test1 = Set([1, 2, 3, 4, 5])
         test2 = Set([1, 2, 3, 4, 5])
