@@ -68,6 +68,16 @@ class Set(object):
                 newset.append(item)
         return Set(newset)
 
+    def difference(self, other_set):
+        newset = Set(self.contents())
+        for item in other_set.contents():
+            if newset.contains(item):
+                newset.remove(item)
+            else:
+                newset.add(item)
+        return newset
+
+
     def intersection(self, other_set):
         """Return a new set that is an intersection of this set + other_set.
         O(n); goes through every item and has contains"""
@@ -91,8 +101,10 @@ class Set(object):
         else:
             return False
 #
-# test1 = Set([6, 7, 8, 9, 10])
-# test2 = Set([1, 2, 3, 4, 5])
+
+test1 = Set([4, 5, 6, 7, 8])
+test2 = Set([1, 2, 3, 4, 5])
+print(test1.difference(test2))
 # result = test1.intersection(test2)
 # print(result)
 # test2 = Set([4, 5, 6, 7, 8])
