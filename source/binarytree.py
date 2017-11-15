@@ -198,7 +198,7 @@ class BinarySearchTree(object):
         items = []
         if not self.is_empty():
             # Traverse tree in-order from root, appending each node's item
-            items = self._traverse_in_order_recursive(self.root, items)
+            items = self._traverse_in_order_iterative(self.root, items)
         # Return in-order list of all items in tree
         return items
 
@@ -224,14 +224,34 @@ class BinarySearchTree(object):
         Start at the given node and visit each node with the given function.
         TODO: Running time: ??? Why and under what conditions?
         TODO: Memory usage: ??? Why and under what conditions?"""
-        # TODO: Traverse in-order without using recursion (stretch challenge)
+
+        queue = DeQueue()
+        queue.enqueue_front(node)
+        # I'm going to need a blackboard for this
+        while queue.length() > 0:
+            # Go as left as possible!
+            while node.left is not None:
+                queue.enqueue_front(node.left)
+                node = node.left
+            # If there's no more left, let's pop something + append
+            else:
+                node = queue.dequeue_front()
+                visit.append(node.data)
+                # Check right and eventually see if it has lefts
+                # If it doesn't have a left, we skip the above while loop
+                if node.right:
+                    queue.enqueue_front(node.right)
+                    node = node.right
+        return visit
+
+
 
     def items_pre_order(self):
         """Return a pre-order list of all items in this binary search tree."""
         items = []
         if not self.is_empty():
             # Traverse tree pre-order from root, appending each node's item
-            items = self._traverse_pre_order_recursive(self.root, items)
+            items = self._traverse_pre_order_iterative(self.root, items)
         # Return pre-order list of all items in tree
         return items
 
@@ -257,13 +277,46 @@ class BinarySearchTree(object):
         TODO: Running time: ??? Why and under what conditions?
         TODO: Memory usage: ??? Why and under what conditions?"""
         # TODO: Traverse pre-order without using recursion (stretch challenge)
+        # [8, 4, 2, 1, 3, 6, 5, 7, 12, 10, 9, 11, 14, 13, 15]
+        queue = DeQueue()
+        queue.enqueue_front(node)
+        # I'm going to need a blackboard for this
+        # while queue.length() > 0:
+        #     while node.left is not None:
+        #         queue.enqueue_front(node)
+        #         node = node.left
+        #         visit.append(node.data)
+        #     else:
+        #         node = queue.dequeue_front()
+        #         if node.right:
+        #             node = node.right
+        #             visit.append(node.data)
+        #
+        # Above was close, but kept printing the root's right at the end!
+
+        while queue.length() > 0:
+            # Keep popping the first thing that shows up!
+            node = queue.dequeue_front()
+            visit.append(node.data)
+            # We need to make sure we add the right first before left
+            # This is to make sure the leftmost is stacked/printed last
+            if node.right:
+                queue.enqueue_front(node.right)
+            if node.left:
+                queue.enqueue_front(node.left)
+            # Because of this order, this prints what's IMMEDIATELY left
+            # then go deeper left before going right
+
+
+
+        return visit
 
     def items_post_order(self):
         """Return a post-order list of all items in this binary search tree."""
         items = []
         if not self.is_empty():
             # Traverse tree post-order from root, appending each node's item
-            items = self._traverse_post_order_recursive(self.root, items)
+            items = self._traverse_post_order_iterative(self.root, items)
         # Return post-order list of all items in tree
         return items
 
@@ -288,6 +341,21 @@ class BinarySearchTree(object):
         TODO: Running time: ??? Why and under what conditions?
         TODO: Memory usage: ??? Why and under what conditions?"""
         # TODO: Traverse post-order without using recursion (stretch challenge)
+        queue = DeQueue()
+        queue.enqueue_front(node)
+
+        while queue.length() > 0:
+            while node.right is not None:
+                queue.enqueue_front(node)
+                node = node.right
+            else:
+                node = queue.dequeue_front()
+                if node.right:
+                    node = node.right
+                    print(node)
+
+
+        return visit
 
     def items_level_order(self):
         """Return a level-order list of all items in this binary search tree."""
@@ -306,7 +374,7 @@ class BinarySearchTree(object):
         # TODO: Create queue to store nodes not yet traversed in level-order
         queue = DeQueue()
         # TODO: Enqueue given starting node
-        queue.enqueue_front(self.root)
+        queue.enqueue_front(start_node)
         # TODO: Loop until queue is empty
         while queue.length() > 0:
             # TODO: Dequeue node at front of queue
