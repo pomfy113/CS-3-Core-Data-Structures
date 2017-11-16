@@ -191,7 +191,7 @@ class BinarySearchTree(object):
             return self._find_node(item, node.right)
 
 
-    def _find_parent_node(self, item):
+    def _find_parent_node_iterative(self, item):
         """Return the parent node of the node containing the given item
         (or the parent node of where the given item would be if inserted)
         in this tree, or None if this tree is empty or has only a root node.
@@ -217,7 +217,7 @@ class BinarySearchTree(object):
                 node = node.right
         # Not found
         return parent
-    def _find_parent_node_recursive(self, item, node=None, parent=None):
+    def _find_parent_node(self, item, node=None, parent=None):
         """Recursive version.
 
         Return the node containing the given item in this binary search tree,
@@ -225,22 +225,22 @@ class BinarySearchTree(object):
         O(log(n)); the find_node goes through a certain series, so we only
         need to go a certain distance."""
         # Start with the root node
-        if node == None:
+        if node is None:
             node = self.root
             # Check if the given item matches the node's data
         if item == node.data:
             # Return the found node
-            return node
-        elif node.is_leaf():
-            return None
+            return parent
         # Check if the given item is less than the node's data
         elif item < node.data and node.left is not None:
             # Descend to the node's left child
-            return self._find_node(item, node.left)
+            return self._find_parent_node(item, node.left, node)
         # Check if the given item is greater than the node's data
         elif item > node.data and node.right is not None:
             # Descend to the node's right child
-            return self._find_node(item, node.right)
+            return self._find_parent_node(item, node.right, node)
+        else:
+            return node
 
     # This space intentionally left blank (please do not delete this comment)
 
@@ -256,13 +256,14 @@ class BinarySearchTree(object):
     def _traverse_in_order_recursive(self, node, visit):
         """Traverse this binary tree with recursive in-order traversal (DFS).
         Start at the given node and visit each node with the given function.
-        TODO: Running time: ??? Why and under what conditions?
-        TODO: Memory usage: ??? Why and under what conditions?"""
+        Running time: O(n); we have to go through all of the nodes anyway?
+        Memory usage: O(height); call stack goes that far before doing visits
+        """
         # Traverse left subtree, if it exists
         if node.left is not None:
             self._traverse_in_order_recursive(node.left, visit)
         # Visit this node's data with given function
-        visit.append(node.data)
+        visit(node.data)
         # Traverse right subtree, if it exists
         if node.right is not None:
             self._traverse_in_order_recursive(node.right, visit)
@@ -273,8 +274,8 @@ class BinarySearchTree(object):
     def _traverse_in_order_iterative(self, node, visit):
         """Traverse this binary tree with iterative in-order traversal (DFS).
         Start at the given node and visit each node with the given function.
-        TODO: Running time: ??? Why and under what conditions?
-        TODO: Memory usage: ??? Why and under what conditions?"""
+        Running time: O(n); we have to go through all of the nodes anyway
+        Memory usage: O(height?) We do queue all of the left node"""
 
         stack = DeQueue()
         stack.enqueue_front(node)
@@ -309,14 +310,15 @@ class BinarySearchTree(object):
     def _traverse_pre_order_recursive(self, node, visit):
         """Traverse this binary tree with recursive pre-order traversal (DFS).
         Start at the given node and visit each node with the given function.
-        TODO: Running time: ??? Why and under what conditions?
-        TODO: Memory usage: ??? Why and under what conditions?"""
+        Running time: O(n); ALL the nodes!
+        Memory usage: A lot smaller? Like, 1 due to the call stack?
+        """
         # Visit this node's data with given function
         visit(node.data)
-        # TODO: Traverse left subtree, if it exists
+        # Traverse left subtree, if it exists
         if node.left is not None:
             self._traverse_pre_order_recursive(node.left, visit)
-        # TODO: Traverse right subtree, if it exists
+        # Traverse right subtree, if it exists
         if node.right is not None:
             self._traverse_pre_order_recursive(node.right, visit)
 
@@ -325,9 +327,9 @@ class BinarySearchTree(object):
     def _traverse_pre_order_iterative(self, node, visit):
         """Traverse this binary tree with iterative pre-order traversal (DFS).
         Start at the given node and visit each node with the given function.
-        TODO: Running time: ??? Why and under what conditions?
-        TODO: Memory usage: ??? Why and under what conditions?"""
-        # TODO: Traverse pre-order without using recursion (stretch challenge)
+        Running time: O(n forever man)
+        Memory usage: Depends on a diagonal; no clue how to calculate this"""
+        # Traverse pre-order without using recursion (stretch challenge)
         # [8, 4, 2, 1, 3, 6, 5, 7, 12, 10, 9, 11, 14, 13, 15]
         stack = DeQueue()
         stack.enqueue_front(node)
@@ -371,24 +373,25 @@ class BinarySearchTree(object):
     def _traverse_post_order_recursive(self, node, visit):
         """Traverse this binary tree with recursive post-order traversal (DFS).
         Start at the given node and visit each node with the given function.
-        TODO: Running time: ??? Why and under what conditions?
-        TODO: Memory usage: ??? Why and under what conditions?"""
-        # TODO: Traverse left subtree, if it exists
+        Running time: O(n) forever
+        Memory usage: n? It goes through ALL of them first before visiting"""
+        # Traverse left subtree, if it exists
         if node.left is not None:
             self._traverse_post_order_recursive(node.left, visit)
-        # TODO: Traverse right subtree, if it exists
+        # Traverse right subtree, if it exists
         if node.right is not None:
             self._traverse_post_order_recursive(node.right, visit)
-        # TODO: Visit this node's data with given function
+        # Visit this node's data with given function
         visit(node.data)
         return
 
     def _traverse_post_order_iterative(self, node, visit):
         """Traverse this binary tree with iterative post-order traversal (DFS).
         Start at the given node and visit each node with the given function.
-        TODO: Running time: ??? Why and under what conditions?
-        TODO: Memory usage: ??? Why and under what conditions?"""
-        # TODO: Traverse post-order without using recursion (stretch challenge)
+        Running time: O(n)
+        Memory usage: Half of the tree. It goes down one half before another
+        """
+        # Traverse post-order without using recursion (stretch challenge)
         stack = DeQueue()
 
         # while (stack.length() > 0) or (node):
@@ -458,7 +461,8 @@ class BinarySearchTree(object):
                     stack.enqueue_front(node)
                     node = node.right
                 else:
-                    # Put that in the visit
+                    # Put that in the visit. It's ALWAYS going to do this
+                    # as a last case scenario
                     visit(node.data)
                     node = None
 
@@ -482,8 +486,8 @@ class BinarySearchTree(object):
     def _traverse_level_order_iterative(self, start_node, visit):
         """Traverse this binary tree with iterative level-order traversal (BFS).
         Start at the given node and visit each node with the given function.
-        TODO: Running time: ??? Why and under what conditions?
-        TODO: Memory usage: ??? Why and under what conditions?"""
+        Running time: o(n)
+        Memory usage: Based on size of level, so n/2? """
         #  Create queue to store nodes not yet traversed in level-order
         queue = DeQueue()
         # Enqueue given starting node
