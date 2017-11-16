@@ -212,6 +212,52 @@ class BinarySearchTreeTest(unittest.TestCase):
         # Ensure the level-order traversal of tree items is ordered correctly
         assert tree.items_level_order() == [4, 2, 6, 1, 3, 5, 7]
 
+    def test_height_and_size(self):
+        # Let's try for a balanced tree first
+        items = BinarySearchTree([4])
+        assert items.height() == 0
+        assert items.size == 1
+        # Height 1
+        items.insert(2)  # Insert item, tree grows to 1
+        assert items.height() == 1
+        assert items.size == 2
+        items.insert(6)  # Insert item 2; level is full, tree remains 1
+        assert items.height() == 1
+        assert items.size == 3
+        # Height 2
+        items.insert(1)
+        assert items.height() == 2
+        assert items.size == 4
+        items.insert(3)
+        assert items.height() == 2
+        assert items.size == 5
+        items.insert(5)
+        assert items.height() == 2
+        assert items.size == 6
+        items.insert(7)
+        assert items.height() == 2
+        assert items.size == 7
+
+        # Unbalanced tree
+        items = BinarySearchTree([1, 2])
+        assert items.height() == 1
+        assert items.size == 2
+        items.insert(3)
+        assert items.height() == 2
+        assert items.size == 3
+        items.insert(4)
+        assert items.height() == 3
+        assert items.size == 4
+        items.insert(6)
+        assert items.height() == 4
+        assert items.size == 5
+        items.insert(7)
+        assert items.height() == 5
+        assert items.size == 6
+        items.insert(5)  # Let's throw a left branching for good measure
+        assert items.height() == 5
+        assert items.size == 7
+
 
 if __name__ == '__main__':
     unittest.main()
