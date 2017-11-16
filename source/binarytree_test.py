@@ -258,6 +258,59 @@ class BinarySearchTreeTest(unittest.TestCase):
         assert items.height() == 5
         assert items.size == 7
 
+    def test_delete(self):
+        items = [4, 2, 6, 1, 3, 5, 7]
+        # Balanced tree
+        tree = BinarySearchTree(items)
+        assert tree.items_level_order() == [4, 2, 6, 1, 3, 5, 7]
+        assert tree.size == 7
+        # Delete leaves
+        tree.delete(7)
+        assert tree.items_level_order() == [4, 2, 6, 1, 3, 5]
+        assert tree.size == 6
+        tree.delete(1)
+        assert tree.items_level_order() == [4, 2, 6, 3, 5]
+        assert tree.size == 5
+        # Delete nodes with one branch
+        tree.delete(2)
+        assert tree.items_level_order() == [4, 3, 6, 5]
+        assert tree.size == 4
+        tree.delete(6)
+        assert tree.items_level_order() == [4, 3, 5]
+        assert tree.size == 3
+
+        # Reset
+        tree = BinarySearchTree(items)
+        assert tree.items_level_order() == [4, 2, 6, 1, 3, 5, 7]
+        assert tree.size == 7
+        # Delete double branch
+        tree.delete(2)
+        assert tree.items_level_order() == [4, 1, 6, 3, 5, 7]
+        assert tree.size == 6
+        tree.delete(6)
+        assert tree.items_level_order() == [4, 1, 5, 3, 7]
+        assert tree.size == 5
+
+        # Reset
+        tree = BinarySearchTree(items)
+        assert tree.items_level_order() == [4, 2, 6, 1, 3, 5, 7]
+        assert tree.size == 7
+        # Delete root
+        tree.delete(4)
+        print(tree.items_level_order())
+        assert tree.items_level_order() == [3, 2, 6, 1, 5, 7]
+
+        # Larger tree
+        items = [8, 4, 12, 2, 6, 10, 14, 1, 3, 5, 7, 9, 11, 13, 15]
+        tree = BinarySearchTree(items)
+        tree.delete(8)
+        assert tree.items_level_order() == [7, 4, 12, 2, 6, 10, 14, 1, 3, 5, 9, 11, 13, 15]
+        tree.delete(7)
+        print(tree.items_level_order())
+        assert tree.items_level_order() == [6, 4, 12, 2, 5, 10, 14, 1, 3, 9, 11, 13, 15]
+        tree.delete(6)
+        print(tree.items_level_order())
+        assert tree.items_level_order() == [5, 4, 12, 2, 10, 14, 1, 3, 9, 11, 13, 15]
 
 if __name__ == '__main__':
     unittest.main()

@@ -30,6 +30,20 @@ class BinaryTreeNode(object):
         else:
             return True
 
+    def is_1branch(self):
+        if self.left is None and self.right is not None:
+            return True
+        elif self.left is not None and self.right is None:
+            return True
+        else:
+            return False
+
+    def is_2branch(self):
+        if self.left is not None and self.right is not None:
+            return True
+        else:
+            return False
+
     def height(self):
         """Return the height of this node (the number of edges on the longest
         downward path from this node to a descendant leaf node).
@@ -113,34 +127,6 @@ class BinarySearchTree(object):
 
         self.size += 1
 
-    # def delete(self, item):
-    #     """Oh man, this is a doozy."""
-    #     if self.root.data == item:
-    #         self.root = None
-    #         self.size = 0
-    #         print("Uprooted.")
-    #
-    #     parent = self._find_parent_node(item)
-    #
-    #     if parent is None:
-    #         return
-    #     elif parent.left.data is item:
-    #         deletednode = parent.left
-    #         if deletednode.is_leaf():
-    #             deletednode = None
-    #         elif parent.left.is_branch():
-    #             parent.left = deletednode.right
-    #             parent.left.left = deletednode.left
-    #     elif parent.right.data is item:
-    #         deletednode = parent.right
-    #         if deletednode.is_leaf():
-    #             deletednode = None
-    #         elif parent.right.is_branch():
-    #             parent.right = deletednode.right
-    #             parent.right.left = deletednode.left
-    #     self.size -= 1
-    #     return
-
     def _find_node_iterative(self, item):
         """Return the node containing the given item in this binary search tree,
         or None if the given item is not found.
@@ -173,7 +159,7 @@ class BinarySearchTree(object):
         O(log(n)); the find_node goes through a certain series, so we only
         need to go a certain distance."""
         # Start with the root node
-        if node == None:
+        if node is None:
             node = self.root
             # Check if the given item matches the node's data
         if item == node.data:
@@ -187,6 +173,7 @@ class BinarySearchTree(object):
             return self._find_node(item, node.left)
         # Check if the given item is greater than the node's data
         elif item > node.data and node.right is not None:
+
             # Descend to the node's right child
             return self._find_node(item, node.right)
 
@@ -197,6 +184,8 @@ class BinarySearchTree(object):
         in this tree, or None if this tree is empty or has only a root node.
         Also log(n); we traverse height"""
         # Start with the root node and keep track of its parent
+        if self.contains(item):
+            return
         node = self.root
         parent = None
         # Loop until we descend past the closest leaf node
@@ -505,6 +494,111 @@ class BinarySearchTree(object):
             if node.right:
                 queue.enqueue_back(node.right)
 
+    def __leaf_delete(self, node, parent):
+        # If root, there's nothing left
+        if self.root is node:
+            self.root = None
+        # Else, we just have parent link to nothing
+        elif parent.right is node:
+            parent.right = None
+        elif parent.left is node:
+            parent.left = None
+        else:
+            raise ValueError
+
+    def __1branch_delete(self, node, parent):
+        """Called by delete.
+        Deletes node, replaces it with its single branch."""
+        # If root, we need to get the descendent
+        if self.root is node:
+            if node.left is not None:
+                self.root = node.left
+            elif node.right is not None:
+                self.root = node.right
+            return
+        # Else, we need to check the parent
+        # It needs to grab the node's lone child
+        elif parent.left == node:
+            if node.right:
+                parent.left = node.right
+            elif node.left:
+                parent.right = node.left
+        elif parent.right == node:
+            if node.right:
+                parent.right = node.right
+            elif node.left:
+                parent.right = node.left
+        else:
+            raise ValueError
+
+    def __2branch_delete(self, node, parent):
+        """Called by delete.
+        Deletes node, replaces with successor."""
+        searchparent = node
+        search = node.left
+        while search.right is not None:
+            searchparent = search
+            search = search.right
+        # Let's establish that we will ALWAYS go left,
+        # Then all the way to the right
+        print("SEARCH:", search)
+
+        if search.is_1branch():
+            # Only possibility for the node having a child is a left branch
+            print("It's a one brancher")
+            print(search, search.left, search.right)
+            searchparent.right = search.left
+            print(self.items_level_order(), "\n\n")
+
+        # Moving on to the delete
+        #
+        if self.root is node:
+            if search.is_leaf():
+                # It can only be right anyway
+                searchparent.right = None
+
+            self.root = search
+
+            if node.left is not search:
+                search.left = node.left
+            if node.right is not search:
+                search.right = node.right
+            return
+        #
+        elif parent.left == node:
+            parent.left = search
+
+            if node.left is not search:
+                search.left = node.left
+            if node.right is not search:
+                search.right = node.right
+        elif parent.right == node:
+            parent.right = search
+            if node.left is not search:
+                search.left = node.left
+            if node.right is not search:
+                search.right = node.right
+
+        else:
+            raise ValueError
+
+    def delete(self, item):
+        """Oh man, this is a doozy."""
+        if not self.contains(item):
+            return
+        parent = self._find_parent_node(item)
+        node = self._find_node(item)
+        node.is_1branch()
+
+        if node.is_leaf():
+            self.__leaf_delete(node, parent)
+        elif node.is_1branch():
+            self.__1branch_delete(node, parent)
+        elif node.is_2branch():
+            self.__2branch_delete(node, parent)
+        self.size -= 1
+        return
+
 def test_binary_search_tree():
     # Create a complete binary search tree of 3, 7, or 15 items in level-order
     # items = [2, 1, 3]
@@ -536,6 +630,56 @@ def test_binary_search_tree():
     print('items post-order:  {}'.format(tree.items_post_order()))
     print('items level-order: {}'.format(tree.items_level_order()))
 
+    # print("8:")
+    # tree.delete(8)
+
+    print(tree.items_level_order())
+    print("\n1:")
+    tree.delete(1)
+    print(tree.items_level_order())
+    print("\n2:")
+    tree.delete(2)
+    print(tree.items_level_order())
+    # print("\n3:")
+    # tree.delete(3)
+    # print(tree.items_level_order())
+    print("\n6:")
+    tree.delete(6)
+    print(tree.items_level_order())
+
+    testtree = BinarySearchTree([7, 3, 1, 4, 2, 6, 5])
+    print(testtree.items_level_order())
+    testtree.delete(4)
+    print(testtree.items_level_order())
+    # Deleting root
+    testtree.delete(7)
+    print(testtree.items_level_order())
+    testtree.delete(1)
+    print(testtree.items_level_order())
+    # Deleting root
+    print("\n\nPROBLEM HERE?")
+    testtree.delete(3)
+    print(testtree.items_level_order())
+
+    items = [8, 4, 12, 2, 6, 10, 14, 1, 3, 5, 7, 9, 11, 13, 15]
+    tree = BinarySearchTree(items)
+    print("====== DELETING 8 ====== ")
+    tree.delete(8)
+    print("====== DELETING 7 ====== ")
+
+    print(tree.items_level_order())
+    tree.delete(7)
+    print(tree.items_level_order())
+
+
+    # print("\n2:")
+    # tree.delete(2)
+    # print("\n3:")
+    # tree.delete(3)
+    #
+    # print("\n15:")
+    # tree.insert(16)
+    # tree.delete(15)
 
 if __name__ == '__main__':
     test_binary_search_tree()
