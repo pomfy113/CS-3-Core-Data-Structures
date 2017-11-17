@@ -21,8 +21,6 @@ class Basic_Searches(object):
             swapped = False
             # Go through entire list
             for i in range(right-1):
-                # Check early exit; if this doesn't change, we're done
-                swapped = False
                 # Compare the two elements
                 # If it was swapped, we're not completely done yet
                 if array[i] > array[i+1]:
@@ -38,7 +36,8 @@ class Basic_Searches(object):
         print("\nTIME:", (time.time() - start_time)*1000, "ms\n")
         return array
 
-    def insertion_sort1(self):
+    def insertion_sort_naive(self):
+        """Insertion sort - swapping edition."""
         # For benchmarking
         array = self.items[:]
         iterations = 0
@@ -48,6 +47,7 @@ class Basic_Searches(object):
         for index in range(len(array)):
             item = index
 
+            # Keep going down the list, swap if something is smaller
             while array[index] < array[item-1] and index > 0:
                 array[index], array[item-1] = array[item-1], array[index]
                 index -= 1
@@ -60,8 +60,8 @@ class Basic_Searches(object):
         print("\nTIME:", (time.time() - start_time)*1000, "ms\n")
         return array
 
-    def insertion_sort2(self):
-        """Insertion sort."""
+    def insertion_sort(self):
+        """Insertion sort - Search and Destroy Edition"""
         # For benchmarking
         array = self.items[:]
         iterations = 0
@@ -87,26 +87,36 @@ class Basic_Searches(object):
 
     def selection_sort(self):
         """Selection sort."""
+        """NOTE: WRONG SELECTION SORT?"""
         # For benchmarking
         array = self.items[:]
         iterations = 0
         start_time = time.time()
 
-        newarray = []
+        # ... Wait, WHY am I making a new array?
+        # newarray = []
         for index in range(len(array)):
 
-            lowest = 0
-            for item in range(len(array)):
+            lowest = index
+            # Keep looking for lowest number
+            for item in range(index, len(array)):
+
                 if array[item] < array[lowest]:
                     lowest = item
 
-            newitem = array.pop(lowest)
-            newarray.append(newitem)
+            # # If so, pop it from original list and put it into sorted array
+            # newitem = array.pop(lowest)
+            # newarray.append(newitem)
+            # CHANGE OF PLANS
+            array[index], array[lowest] = array[lowest], array[index]
+
             iterations += 1
+
+
         print("* * SELECTION SORT * *")
         print("COMPLETE LOOPS:", iterations)
         print("\nTIME:", (time.time() - start_time)*1000, "ms\n")
-        return newarray
+        return array
 
 
 import random
@@ -126,10 +136,14 @@ print("* * * * * * * * * * * * * * * * * * * * * * *\n\n")
 
 print("Randomized list:", search.items)
 print("============================\n")
-print(search.bubble_sort())
+# print(search.bubble_sort())
+search.bubble_sort()
 print("============================\n")
-print(search.insertion_sort1())
+# print(search.insertion_sort_naive())
+search.insertion_sort_naive()
 print("============================\n")
-print(search.insertion_sort2())
+# print(search.insertion_sort())
+search.insertion_sort()
 print("============================\n")
-print(search.selection_sort())
+# print(search.selection_sort())
+search.selection_sort()

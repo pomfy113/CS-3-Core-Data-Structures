@@ -3,30 +3,70 @@
 
 def is_sorted(items):
     """Return a boolean indicating whether given items are in sorted order."""
-    # TODO: Check that all adjacent items are in order, return early if not
+    for i in range(len(items)-1):
+        # If the preceeding is larger, it's not sorted
+        if items[i] > items[i+1]:
+            return False
+    # Got through all of it? It's sorted
+    return True
 
 
 def bubble_sort(items):
     """Sort given items by swapping adjacent items that are out of order, and
     repeating until all items are in sorted order."""
-    # TODO: Repeat until all items are in sorted order
-    # TODO: Swap adjacent items that are out of order
+    # Repeat until all items are in sorted order
+    limit = len(items)
+    swapped = True
+    while limit != 0 and swapped is True:
+        # Early exit; if not changed, exit
+        swapped = False
+
+        for i in range(limit-1):
+            # Swap adjacent items that are out of order
+            if items[i] > items[i+1]:
+                items[i], items[i+1] = items[i+1], items[i]
+                swapped = True
+        # We can go smaller each time we go through
+        limit -= 1
+
+    return items
 
 
 def selection_sort(items):
     """Sort given items by finding minimum item, swapping it with first
     unsorted item, and repeating until all items are in sorted order."""
-    # TODO: Repeat until all items are in sorted order
-    # TODO: Find minimum item in unsorted items
-    # TODO: Swap it with first unsorted item
+    # Repeat until all items are in sorted order
+    for index in range(len(items)):
+        # Will hold lowest number we found so far
+        # Start with first unsorted number
+        lowest_index = index
+
+        # Find minimum item in unsorted items; go up slowly
+        for check_index in range(index, len(items)):
+            # If we find a new lowest number, save its index
+            if items[check_index] < items[lowest_index]:
+                lowest_index = check_index
+        # Swap it with first unsorted item
+        items[index], items[lowest_index] = items[lowest_index], items[index]
+
+    return items
 
 
 def insertion_sort(items):
     """Sort given items by taking first unsorted item, inserting it in sorted
     order in front of items, and repeating until all items are in order."""
-    # TODO: Repeat until all items are in sorted order
-    # TODO: Take first unsorted item
-    # TODO: Insert it in sorted order in front of items
+    # Repeat until all items are in sorted order
+    for index in range(len(items)):
+        iterator = index
+
+        # Take first unsorted item
+        while items[index] < items[iterator-1] and iterator > 0:
+            iterator -= 1
+    # Insert it in sorted order in front of items
+        sorteditem = items.pop(index)
+        items.insert(iterator, sorteditem)
+
+    return items
 
 
 def test_sorting(sort=bubble_sort, num_items=20, max_value=50):
