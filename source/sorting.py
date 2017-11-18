@@ -1,5 +1,5 @@
 #!python
-
+import operator
 
 def is_sorted(items):
     """Return a boolean indicating whether given items are in sorted order."""
@@ -11,19 +11,25 @@ def is_sorted(items):
     return True
 
 
-def bubble_sort(items):
+def bubble_sort(items, order):
     """Sort given items by swapping adjacent items that are out of order, and
     repeating until all items are in sorted order."""
     # Repeat until all items are in sorted order
     limit = len(items)
     swapped = True
+
+    if order == "reverse":
+        compare = operator.lt
+    elif order == "normal":
+        compare = operator.gt
+
     while limit != 0 and swapped is True:
         # Early exit; if not changed, exit
         swapped = False
 
         for i in range(limit-1):
             # Swap adjacent items that are out of order
-            if items[i] > items[i+1]:
+            if compare(items[i], items[i+1]):
                 items[i], items[i+1] = items[i+1], items[i]
                 swapped = True
         # We can go smaller each time we go through
@@ -32,9 +38,14 @@ def bubble_sort(items):
     return items
 
 
-def selection_sort(items):
+def selection_sort(items, order):
     """Sort given items by finding minimum item, swapping it with first
     unsorted item, and repeating until all items are in sorted order."""
+    if order == "reverse":
+        compare = operator.lt
+    elif order == "normal":
+        compare = operator.gt
+
     # Repeat until all items are in sorted order
     for index in range(len(items)):
         # Will hold lowest number we found so far
@@ -44,7 +55,7 @@ def selection_sort(items):
         # Find minimum item in unsorted items; go up slowly
         for check_index in range(index, len(items)):
             # If we find a new lowest number, save its index
-            if items[check_index] < items[lowest_index]:
+            if compare(items[lowest_index], items[check_index]):
                 lowest_index = check_index
         # Swap it with first unsorted item
         items[index], items[lowest_index] = items[lowest_index], items[index]
@@ -52,15 +63,20 @@ def selection_sort(items):
     return items
 
 
-def insertion_sort(items):
+def insertion_sort(items, order):
     """Sort given items by taking first unsorted item, inserting it in sorted
     order in front of items, and repeating until all items are in order."""
+    if order == "reverse":
+        compare = operator.lt
+    elif order == "normal":
+        compare = operator.gt
+
     # Repeat until all items are in sorted order
     for index in range(len(items)):
         iterator = index
 
         # Take first unsorted item
-        while items[index] < items[iterator-1] and iterator > 0:
+        while compare(items[iterator-1], items[index]) and iterator > 0:
             iterator -= 1
     # Insert it in sorted order in front of items
         sorteditem = items.pop(index)
@@ -69,7 +85,7 @@ def insertion_sort(items):
     return items
 
 
-def test_sorting(sort=bubble_sort, num_items=20, max_value=50):
+def test_sorting(sort=bubble_sort, num_items=20, max_value=50, order="normal"):
     """Test sorting algorithms with a small list of random items."""
     # Create a list of 8 or 16 items in arbitrary order
     # items = [3, 5, 4, 2, 6, 8, 1, 7]
@@ -85,7 +101,7 @@ def test_sorting(sort=bubble_sort, num_items=20, max_value=50):
     # Change this sort variable to the sorting algorithm you want to test
     # sort = bubble_sort
     print('Sorting items with {}(items)'.format(sort.__name__))
-    sort(items)
+    sort(items, order)
     print('Sorted items:  {!r}'.format(items))
 
 
@@ -106,12 +122,13 @@ def main():
     try:
         num_items = int(args[1]) if len(args) >= 2 else 20
         max_value = int(args[2]) if len(args) >= 3 else 50
+        order = args[3] if len(args) >= 4 else "normal"
     except:
         print('Integer required for `num` and `max` command-line arguments')
 
     # Test sort function, but don't explode if sort function does not exist
     try:
-        test_sorting(sort, num_items, max_value)
+        test_sorting(sort, num_items, max_value, order)
     except NameError:
         script = sys.argv[0]  # Get script file name
         print('Usage: {} sort num max'.format(script))
