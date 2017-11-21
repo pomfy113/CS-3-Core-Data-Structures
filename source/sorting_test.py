@@ -108,7 +108,7 @@ class IsSortedTest(unittest.TestCase):
         assert is_sorted([('B', 3), ('A', 5)]) is False  # First item unsorted
         assert is_sorted([('A', 5), ('A', 3)]) is False  # Second item unsorted
         # TODO: Write more negative test cases with assert is False statements
-        # ...
+        # HOW DO I EVEN START
 
 
 class SortTest(unittest.TestCase):
