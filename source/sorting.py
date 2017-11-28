@@ -111,70 +111,55 @@ def selection_sort(items, key):
 
 def insertion_sort(items, key):
     """Sort given items by taking first unsorted item, inserting it in sorted
-    order in front of items, and repeating until all items are in order."""
-    # if order == "reverse":
-    #     compare = operator.lt
-    # elif order == "normal":
-    #     compare = operator.gt
-    global COMPARE
-
-    # Repeat until all items are in sorted order
-    for index in range(len(items)):
-        iterator = index
-
-        # Take first unsorted item
-        while COMPARE(key(items[iterator-1]), key(items[index])) and iterator > 0:
-            iterator -= 1
-    # Insert it in sorted order in front of items
-        sorteditem = items.pop(index)
-        items.insert(iterator, sorteditem)
-
-    return items
-
-def merge_sort(items, key):
-    """Divide and conquer; split the items in the array, then sort."""
-    # Check endcase
-    if (len(items) / 2) > 1:
-        global COMPARE
-        # Pivot point/middle
-        pivot = int(len(items) / 2)
-        # Recursive call
-        left = merge_sort(items[0:pivot], key)
-        right = merge_sort(items[pivot:len(items)], key)
-        # Init the variables
-        l_index = r_index = 0
-        merged = []
-        # Merging
-        while (l_index < len(left)) and (r_index < len(right)):
-            # If right index is larger, append left[index]; increase l. index
-            if COMPARE(right[r_index], left[l_index]):
-                merged.append(left[l_index])
-                l_index += 1
-            # If left index is larger, append right[index]; increase r. index
-            elif COMPARE(left[l_index], right[r_index]):
-                merged.append(right[r_index])
-                r_index += 1
-        # Add remaining merge
-        if(l_index == len(left)):
-            merged.extend(right[r_index:])
-        elif(r_index == len(left)):
-            merged.extend(left[l_index:])
-        # Return list
-        return merged
-    else:
-        # End of the line!
-        return bubble_sort(items, key)
+    order in front of items, and repeating until all items are in order.
+    TODO: Running time: ??? Why and under what conditions?
+    TODO: Memory usage: ??? Why and under what conditions?"""
+    # TODO: Repeat until all items are in sorted order
+    # TODO: Take first unsorted item
+    # TODO: Insert it in sorted order in front of items
 
 
+def merge(items1, items2):
+    """Merge given lists of items, each assumed to already be in sorted order,
+    and return a new list containing all items in sorted order.
+    TODO: Running time: ??? Why and under what conditions?
+    TODO: Memory usage: ??? Why and under what conditions?"""
+    # TODO: Repeat until one list is empty
+    # TODO: Find minimum item in both lists and append it to new list
+    # TODO: Append remaining items in non-empty list to new list
 
 
+def split_sort_merge(items):
+    """Sort given items by splitting list into two approximately equal halves,
+    sorting each with an iterative sorting algorithm, and merging results into
+    a list in sorted order.
+    TODO: Running time: ??? Why and under what conditions?
+    TODO: Memory usage: ??? Why and under what conditions?"""
+    # TODO: Split items list into approximately equal halves
+    # TODO: Sort each half using any other sorting algorithm
+    # TODO: Merge sorted halves into one list in sorted order
 
-def test_sorting(sort=bubble_sort, num_items=20, max_value=50, order="normal", key=None):
+
+def merge_sort(items):
+    """Sort given items by splitting list into two approximately equal halves,
+    sorting each recursively, and merging results into a list in sorted order.
+    TODO: Running time: ??? Why and under what conditions?
+    TODO: Memory usage: ??? Why and under what conditions?"""
+    # TODO: Check if list is so small it's already sorted (base case)
+    # TODO: Split items list into approximately equal halves
+    # TODO: Sort each half by recursively calling merge sort
+    # TODO: Merge sorted halves into one list in sorted order
+
+
+def random_ints(count=20, min=1, max=50):
+    """Return a list of `count` integers sampled uniformly at random from
+    given range [`min`...`max`] with replacement (duplicates are allowed)."""
+    import random
+    return [random.randint(min, max) for _ in range(count)]
+
+
+def test_sorting(sort=bubble_sort, num_items=20, max_value=50, key):
     """Test sorting algorithms with a small list of random items."""
-    # Create a list of 8 or 16 items in arbitrary order
-    # items = [3, 5, 4, 2, 6, 8, 1, 7]
-    # items = [11, 13, 8, 4, 12, 2, 14, 3, 5, 18, 6, 10, 1, 7, 9, 15]
-
     # Create a list of items randomly sampled from range [1...max_value]
     import random
     items = random.sample(range(1, max_value + 1), num_items)
@@ -184,6 +169,7 @@ def test_sorting(sort=bubble_sort, num_items=20, max_value=50, order="normal", k
     # item_range = list(range(1, max_value + 1))
     # items = [random.choice(item_range for _ in range(num_items))]
     print('Initial items: {!r}'.format(items))
+    print('Sorted order?  {!r}'.format(is_sorted(items)))
 
     # Change this sort variable to the sorting algorithm you want to test
     # sort = bubble_sort
@@ -198,6 +184,8 @@ def test_sorting(sort=bubble_sort, num_items=20, max_value=50, order="normal", k
     # Changed to make merge_sort possible
     sorted_items = sort(items, key)
     print('Sorted items:  {!r}'.format(sorted_items))
+    print('Sorted order?  {!r}'.format(is_sorted(items)))
+
 
 
 def main():
@@ -205,13 +193,31 @@ def main():
     import sys
     args = sys.argv[1:]  # Ignore script file name
 
+    if len(args) == 0:
+        script = sys.argv[0]  # Get script file name
+        print('Usage: {} sort num max'.format(script))
+        print('Test sorting algorithm `sort` with a list of `num` integers')
+        print('    randomly sampled from the range [1...`max`] (inclusive)')
+        print('\nExample: {} bubble_sort 10 20'.format(script))
+        print('Initial items: [3, 15, 4, 7, 20, 6, 18, 11, 9, 7]')
+        print('Sorting items with bubble_sort(items)')
+        print('Sorted items:  [3, 4, 6, 7, 7, 9, 11, 15, 18, 20]')
+        return
+
     # Get sort function by name
     if len(args) >= 1:
         sort_name = args[0]
         # Terrible hack abusing globals
-        sort = globals()[sort_name]
-    else:
-        sort = bubble_sort
+        if sort_name in globals():
+            sort_function = globals()[sort_name]
+        else:
+            # Don't explode, just warn user and show list of sorting functions
+            print('Sorting function {!r} does not exist'.format(sort_name))
+            print('Available sorting functions:')
+            for name in globals():
+                if name.find('sort') >= 0:
+                    print('    {}'.format(name))
+            return
 
     # Get num_items and max_value, but don't explode if input is not an integer
     try:
@@ -219,8 +225,9 @@ def main():
         max_value = int(args[2]) if len(args) >= 3 else 50
         order = args[3] if len(args) >= 4 else "normal"
         key = eval(args[4]) if len(args) >= 5 else eval("lambda x: x")
-    except:
+    except ValueError:
         print('Integer required for `num` and `max` command-line arguments')
+        return
 
     try:
         order = args[3] if len(args) >= 4 else "normal"
@@ -241,7 +248,6 @@ def main():
         print('\trandomly sampled from the range [1...`max`] (inclusive)')
         print('\tin the either "reverse" or "normal" `order`')
         print('\twith a `key` function (if available)')
-
 
         print('\nExample: {} bubble_sort 10 20'.format(script))
         print('Initial items: [3, 15, 4, 7, 20, 6, 18, 11, 9, 7]')
