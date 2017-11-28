@@ -1,6 +1,9 @@
 #!python
 import operator
 
+# Global var
+COMPARE = operator.gt
+
 def is_sorted(items):
     """Return a boolean indicating whether given items are in sorted order."""
     for i in range(len(items)-1):
@@ -11,17 +14,18 @@ def is_sorted(items):
     return True
 
 
-def bubble_sort(items, order, key):
+def bubble_sort(items, key):
     """Sort given items by swapping adjacent items that are out of order, and
     repeating until all items are in sorted order."""
     # Repeat until all items are in sorted order
     limit = len(items)
     swapped = True
 
-    if order == "reverse":
-        compare = operator.lt
-    elif order == "normal":
-        compare = operator.gt
+    # if order == "reverse":
+    #     compare = operator.lt
+    # elif order == "normal":
+    #     compare = operator.gt
+    global COMPARE
 
     while limit != 0 and swapped is True:
         # Early exit; if not changed, exit
@@ -31,7 +35,7 @@ def bubble_sort(items, order, key):
         for i in range(limit-1):
             # Swap adjacent items that are out of order
             # If there is a key, change those things around
-            if compare(key(items[i]), key(items[i+1])):
+            if COMPARE(key(items[i]), key(items[i+1])):
                 items[i], items[i+1] = items[i+1], items[i]
                 swapped = True
         # We can go smaller each time we go through
@@ -39,17 +43,18 @@ def bubble_sort(items, order, key):
 
     return items
 
-def cocktail_sort(items, order, key):
+def cocktail_sort(items, key):
     """Sort given items by swapping adjacent items that are out of order, and
     repeating until all items are in sorted order."""
     # Repeat until all items are in sorted order
     limit = len(items)
     swapped = True
 
-    if order == "reverse":
-        compare = operator.lt
-    elif order == "normal":
-        compare = operator.gt
+    # if order == "reverse":
+    #     compare = operator.lt
+    # elif order == "normal":
+    #     compare = operator.gt
+    global COMPARE
 
     while limit != 0 and swapped is True:
         # Early exit; if not changed, exit
@@ -58,7 +63,7 @@ def cocktail_sort(items, order, key):
         for i in range(len(items)-limit, limit-1):
             # Swap adjacent items that are out of order
             # If there is a key, change those things around
-            if compare(key(items[i]), key(items[i+1])):
+            if COMPARE(key(items[i]), key(items[i+1])):
                 items[i], items[i+1] = items[i+1], items[i]
                 swapped = True
         # Early exit going left to right
@@ -67,7 +72,7 @@ def cocktail_sort(items, order, key):
 
         # Now doing the reverse
         for i in range((limit-1), len(items)-limit, -1):
-            if compare(key(items[i-1]), key(items[i])):
+            if COMPARE(key(items[i-1]), key(items[i])):
                 items[i], items[i-1] = items[i-1], items[i]
                 swapped = True
         # Early exit going right to left
@@ -78,15 +83,14 @@ def cocktail_sort(items, order, key):
         limit -= 1
 
     return items
-def selection_sort(items, order, key):
+def selection_sort(items, key):
     """Sort given items by finding minimum item, swapping it with first
     unsorted item, and repeating until all items are in sorted order."""
-    if order == "reverse":
-        compare = operator.lt
-    elif order == "normal":
-        compare = operator.gt
-
-    print(order)
+    # if order == "reverse":
+    #     compare = operator.lt
+    # elif order == "normal":
+    #     compare = operator.gt
+    global COMPARE
 
     # Repeat until all items are in sorted order
     for index in range(len(items)):
@@ -97,7 +101,7 @@ def selection_sort(items, order, key):
         # Find minimum item in unsorted items; go up slowly
         for check_index in range(index, len(items)):
             # If we find a new lowest number, save its index
-            if compare(key(items[lowest_index]), key(items[check_index])):
+            if COMPARE(key(items[lowest_index]), key(items[check_index])):
                 lowest_index = check_index
         # Swap it with first unsorted item
         items[index], items[lowest_index] = items[lowest_index], items[index]
@@ -105,26 +109,64 @@ def selection_sort(items, order, key):
     return items
 
 
-def insertion_sort(items, order, key):
+def insertion_sort(items, key):
     """Sort given items by taking first unsorted item, inserting it in sorted
     order in front of items, and repeating until all items are in order."""
-    if order == "reverse":
-        compare = operator.lt
-    elif order == "normal":
-        compare = operator.gt
+    # if order == "reverse":
+    #     compare = operator.lt
+    # elif order == "normal":
+    #     compare = operator.gt
+    global COMPARE
 
     # Repeat until all items are in sorted order
     for index in range(len(items)):
         iterator = index
 
         # Take first unsorted item
-        while compare(key(items[iterator-1]), key(items[index])) and iterator > 0:
+        while COMPARE(key(items[iterator-1]), key(items[index])) and iterator > 0:
             iterator -= 1
     # Insert it in sorted order in front of items
         sorteditem = items.pop(index)
         items.insert(iterator, sorteditem)
 
     return items
+
+def merge_sort(items, key):
+    """Divide and conquer; split the items in the array, then sort."""
+    # Check endcase
+    if (len(items) / 2) > 1:
+        global COMPARE
+        # Pivot point/middle
+        pivot = int(len(items) / 2)
+        # Recursive call
+        left = merge_sort(items[0:pivot], key)
+        right = merge_sort(items[pivot:len(items)], key)
+        # Init the variables
+        l_index = r_index = 0
+        merged = []
+        # Merging
+        while (l_index < len(left)) and (r_index < len(right)):
+            # If right index is larger, append left[index]; increase l. index
+            if COMPARE(right[r_index], left[l_index]):
+                merged.append(left[l_index])
+                l_index += 1
+            # If left index is larger, append right[index]; increase r. index
+            elif COMPARE(left[l_index], right[r_index]):
+                merged.append(right[r_index])
+                r_index += 1
+        # Add remaining merge
+        if(l_index == len(left)):
+            merged.extend(right[r_index:])
+        elif(r_index == len(left)):
+            merged.extend(left[l_index:])
+        # Return list
+        return merged
+    else:
+        # End of the line!
+        return bubble_sort(items, key)
+
+
+
 
 
 def test_sorting(sort=bubble_sort, num_items=20, max_value=50, order="normal", key=None):
@@ -135,10 +177,10 @@ def test_sorting(sort=bubble_sort, num_items=20, max_value=50, order="normal", k
 
     # Create a list of items randomly sampled from range [1...max_value]
     import random
-    # items = random.sample(range(1, max_value + 1), num_items)
+    items = random.sample(range(1, max_value + 1), num_items)
     # items = ["A", "b", "d", "E", "C"]
     # items = [('A', 1), ('B', 3), ('d', 4), ('e', 7), ('F', 9), ('C', 2)]
-    items = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    # items = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     # item_range = list(range(1, max_value + 1))
     # items = [random.choice(item_range for _ in range(num_items))]
     print('Initial items: {!r}'.format(items))
@@ -146,8 +188,16 @@ def test_sorting(sort=bubble_sort, num_items=20, max_value=50, order="normal", k
     # Change this sort variable to the sorting algorithm you want to test
     # sort = bubble_sort
     print('Sorting items with {}(items)'.format(sort.__name__))
-    sort(items, order, key)
-    print('Sorted items:  {!r}'.format(items))
+
+    global COMPARE
+    if order == "reverse":
+        COMPARE = operator.lt
+    elif order == "normal":
+        COMPARE = operator.gt
+
+    # Changed to make merge_sort possible
+    sorted_items = sort(items, key)
+    print('Sorted items:  {!r}'.format(sorted_items))
 
 
 def main():
