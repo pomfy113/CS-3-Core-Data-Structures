@@ -202,11 +202,8 @@ class StringSortTest(unittest.TestCase):
         items3 = ['B', 'C', 'A']
         sort(items3)
         assert items3 == ['A', 'B', 'C']
-<<<<<<< HEAD
-        # Write more positive test cases with assert is True statements
-=======
+
         # TODO: Write more test cases with assert equal list statements
->>>>>>> 304f295769896473fc8929a5b86878716d52c4ac
         # You'll need a lot more than this to test sorting algorithm robustness
         # ...
 
