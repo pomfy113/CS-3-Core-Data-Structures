@@ -1,7 +1,10 @@
 #!python
 import operator
-
+# from pympler import tracker
+# tr = tracker.SummaryTracker()
 # Global var
+from memory_profiler import profile
+
 COMPARE = operator.gt
 KEY = eval("lambda x: x")
 
@@ -224,7 +227,7 @@ def merge_sort(items):
         items[:] = merge(left, right)
         # items[:] = merge2(left, right, items)
 
-def merge2(newlist, oldlist, start, middle, end):
+def merge2(items, items_copy, start, middle, end):
     """Merge given lists of items, each assumed to already be in sorted order,
     and return a new list containing all items in sorted order.
     ASSUMING n IS ORIGINAL LIST AND HALVES ARE (n/2)
@@ -233,72 +236,64 @@ def merge2(newlist, oldlist, start, middle, end):
     Memory usage: n + m"""
     # COMPARE default: (is [arg1] greater than [arg2])
     # KEY default: (do nothing to element)
-    # NOTE: Please make sure that both lists are in order
     """
     GENERAL IDEA:
-        Recall: itemB and itemA switch off.
-        Both start basically the same.
+        So the deal with this is that we're putting things in order inside
+        the copy before copying them back to the items.
 
-        We're going to be using itemB (which we'll be calling 'oldlist') as
-        scratch paper to place all of our values as we're trying to sort.
-        After properly sorted, we change
-
-        The newer list will now hold the updated values, but
+        Because we're using index and then changing the elements (no insert
+        or delete whatsoever), there's no wasted space that I know of.
     """
 
     l_index = start
     r_index = middle
-    # Use this for going through newlist
+    # Use this for going through items
     index = start
 
     while (l_index < middle) and (r_index < end):
-        l_item = newlist[l_index]
-        r_item = newlist[r_index]
-        # if the left item is smaller (or same), place that into new array
-        if(l_item < r_item):
-            oldlist[index] = l_item
+        l_item = items[l_index]
+        r_item = items[r_index]
+        # if the right item is larger, place left item into array
+        if COMPARE(KEY(r_item), KEY(l_item)):
+            items_copy[index] = l_item
             l_index += 1
-        # if the right item is smaller, place that into new array
-        elif(r_item < l_item):
-            oldlist[index] = r_item
+        # if the left item is larger, place right into new array
+        elif COMPARE(KEY(l_item), KEY(r_item)):
+            items_copy[index] = r_item
             r_index += 1
         # Let's do both!
-        elif(r_item == l_item):
-            oldlist[index] = l_item
+        elif KEY(r_item) == KEY(l_item):
+            items_copy[index] = l_item
             l_index += 1
             index += 1
-            oldlist[index] = r_item
+            items_copy[index] = r_item
             r_index += 1
         # Next!
         index += 1
         # Add remains of other list via append
     if(l_index == middle):
         for i in range(r_index, end):
-            oldlist[index] = newlist[i]
+            items_copy[index] = items[i]
             index += 1
 
     elif(r_index == end):
         for i in range(l_index, middle):
-            oldlist[index] = newlist[i]
+            items_copy[index] = items[i]
             index += 1
 
-    # Item B
-    newlist[:] = oldlist
+    # Updating only original copy!
+    for i in range(start, end):
+        items[i] = items_copy[i]
 
-        # Return list
-
-
-
-
-def merge_sort2(itemA, itemB=[]):
+def merge_sort2(items, items_copy=[]):
     """See above merge for details; merge, but using the double buffer."""
-    itemB = itemA[:]
+    items_copy = items[:]
     start = 0
-    end = len(itemA)
+    end = len(items)
     # Hookay, let's get started with this mess
-    mergehelper(itemA, itemB, start, end)
+    mergehelper(items, items_copy, start, end)
 
-def mergehelper(itemA, itemB, start, end):
+def mergehelper(items, items_copy, start, end):
     # We've hit the end
     if end - start < 2:
         return
@@ -306,25 +301,16 @@ def mergehelper(itemA, itemB, start, end):
         # Settle the middle for future uses
         middle = (start+end) // 2
         # Recursive: give smaller and smaller lists
-        mergehelper(itemA, itemB, start, middle)
-        mergehelper(itemA, itemB, middle, end)
-        # We flip itemA and itemB to use double buffer
-        # item B will hold the new, sorted items
-        print((itemA == itemB))
-        merge2(itemB, itemA, start, middle, end)
-        print((itemA == itemB))
-
-
-
-
-
+        mergehelper(items, items_copy, start, middle)
+        mergehelper(items, items_copy, middle, end)
+        # Time to do the merge!
+        merge2(items, items_copy, start, middle, end)
 
 def random_ints(count=20, min=1, max=50):
     """Return a list of `count` integers sampled uniformly at random from
     given range [`min`...`max`] with replacement (duplicates are allowed)."""
     import random
     return [random.randint(min, max) for _ in range(count)]
-
 
 def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
     """Test sorting algorithms with a small list of random items."""
@@ -337,12 +323,12 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
     # items = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     # item_range = list(range(1, max_value + 1))
     # items = [random.choice(item_range for _ in range(num_items))]
-    print('Initial items: {!r}'.format(items))
-    print('Sorted order?  {!r}'.format(is_sorted(items)))
+    # print('Initial items: {!r}'.format(items))
+    # print('Sorted order?  {!r}'.format(is_sorted(items)))
 
     # Change this sort variable to the sorting algorithm you want to test
     # sort = bubble_sort
-    print('Sorting items with {}(items)'.format(sort.__name__))
+    # print('Sorting items with {}(items)'.format(sort.__name__))
 
     global COMPARE
     global KEY
@@ -353,10 +339,8 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
         COMPARE = operator.gt
     # Changed to make merge_sort possible
     sort(items)
-    print('Sorted items:  {!r}'.format(items))
+    # print('Sorted items:  {!r}'.format(items))
     print('Sorted order?  {!r}'.format(is_sorted(items)))
-
-
 
 def main():
     """Read command-line arguments and test sorting algorithms."""
