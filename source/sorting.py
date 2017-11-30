@@ -223,7 +223,8 @@ def merge_sort(items):
         # Merging
         items[:] = merge(left, right)
         # items[:] = merge2(left, right, items)
-def merge2(items, pivot, newlist):
+
+def merge2(newlist, oldlist, start, middle, end):
     """Merge given lists of items, each assumed to already be in sorted order,
     and return a new list containing all items in sorted order.
     ASSUMING n IS ORIGINAL LIST AND HALVES ARE (n/2)
@@ -233,62 +234,90 @@ def merge2(items, pivot, newlist):
     # COMPARE default: (is [arg1] greater than [arg2])
     # KEY default: (do nothing to element)
     # NOTE: Please make sure that both lists are in order
+    """
+    GENERAL IDEA:
+        Recall: itemB and itemA switch off.
+        Both start basically the same.
 
-    # We use pivot as the end of the line for the l_index
-    l_index = items_index = 0
-    r_index = pivot
+        We're going to be using itemB (which we'll be calling 'oldlist') as
+        scratch paper to place all of our values as we're trying to sort.
+        After properly sorted, we change
 
-    # Repeat until one list is empty
-    while (l_index < pivot) and (r_index < len(items)):
-        left_item = items[l_index]
-        right_item = items[r_index]
-        # If right index is larger, append left[index]; increase l. index
-        if COMPARE(KEY(right_item), KEY(left_item)):
-            newlist[items_index] = left_item
+        The newer list will now hold the updated values, but
+    """
+
+    l_index = start
+    r_index = middle
+    # Use this for going through newlist
+    index = start
+
+    while (l_index < middle) and (r_index < end):
+        l_item = newlist[l_index]
+        r_item = newlist[r_index]
+        # if the left item is smaller (or same), place that into new array
+        if(l_item < r_item):
+            oldlist[index] = l_item
             l_index += 1
-        # If left index is larger, append right[index]; increase r. index
-        elif COMPARE(KEY(left_item), KEY(right_item)):
-            newlist[items_index] = right_item
+        # if the right item is smaller, place that into new array
+        elif(r_item < l_item):
+            oldlist[index] = r_item
             r_index += 1
-        # If equal; jam em both in + increment both; no harm, no foul
-        elif(KEY(left_item) == KEY(right_item)):
-            newlist[items_index] = left_item
-            items_index += 1    # Going to want to increase this
+        # Let's do both!
+        elif(r_item == l_item):
+            oldlist[index] = l_item
             l_index += 1
-            newlist[items_index] = right_item
+            index += 1
+            oldlist[index] = r_item
             r_index += 1
-        # Go forward on the list
-        items_index += 1
+        # Next!
+        index += 1
+        # Add remains of other list via append
+    if(l_index == middle):
+        for i in range(r_index, end):
+            oldlist[index] = newlist[i]
+            index += 1
 
-    # Add remains of other list via append
-    if(l_index == pivot):
-        for index in range(r_index, len(items)):
-            newlist[items_index] = items[index]
-            items_index += 1
-    elif(r_index == len(items)):
-        for index in range(l_index, pivot):
-            newlist[items_index] = items[index]
-            items_index += 1
-    return items
+    elif(r_index == end):
+        for i in range(l_index, middle):
+            oldlist[index] = newlist[i]
+            index += 1
 
-def merge_sort2(items):
-    """See above merge for details; merge, but using the double buffer"""
-    # Base case
-    if (len(items)) > 1:
-        # Pivot point/middle
-        pivot = len(items) // 2
-        itemcopy = []
-        # Copy left side of list first to empty array
-        for i in range(0, pivot):
-            itemcopy.append(items[i])
-        merge_sort(itemcopy)
+    # Item B
+    newlist[:] = oldlist
 
-        # Now copy the right side to replace the left side
-        for i in range(pivot, len(items)):
-            itemcopy.append(items[i])
-        merge_sort(itemcopy)
-        # Merging
-        items = merge2(itemcopy, pivot, items)
+        # Return list
+
+
+
+
+def merge_sort2(itemA, itemB=[]):
+    """See above merge for details; merge, but using the double buffer."""
+    itemB = itemA[:]
+    start = 0
+    end = len(itemA)
+    # Hookay, let's get started with this mess
+    mergehelper(itemA, itemB, start, end)
+
+def mergehelper(itemA, itemB, start, end):
+    # We've hit the end
+    if end - start < 2:
+        return
+    else:
+        # Settle the middle for future uses
+        middle = (start+end) // 2
+        # Recursive: give smaller and smaller lists
+        mergehelper(itemA, itemB, start, middle)
+        mergehelper(itemA, itemB, middle, end)
+        # We flip itemA and itemB to use double buffer
+        # item B will hold the new, sorted items
+        print((itemA == itemB))
+        merge2(itemB, itemA, start, middle, end)
+        print((itemA == itemB))
+
+
+
+
+
 
 def random_ints(count=20, min=1, max=50):
     """Return a list of `count` integers sampled uniformly at random from
