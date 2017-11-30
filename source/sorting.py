@@ -52,10 +52,6 @@ def cocktail_sort(items):
     limit = len(items)
     swapped = True
 
-    # if order == "reverse":
-    #     compare = operator.lt
-    # elif order == "normal":
-    #     compare = operator.gt
     global COMPARE
     global KEY
 
@@ -85,7 +81,6 @@ def cocktail_sort(items):
         # We can go smaller each time we go through
         limit -= 1
 
-    return items
 def selection_sort(items):
     """Sort given items by finding minimum item, swapping it with first
     unsorted item, and repeating until all items are in sorted order."""
@@ -124,11 +119,10 @@ def insertion_sort(items):
     # Repeat until all items are in sorted order
     for index in range(len(items)):
         iterator = index
-
         # Take first unsorted item
         while COMPARE(KEY(items[iterator-1]), KEY(items[index])) and iterator > 0:
             iterator -= 1
-    # Insert it in sorted order in front of items
+        # Insert it in sorted order in front of items
         sorteditem = items.pop(index)
         items.insert(iterator, sorteditem)
 
@@ -138,64 +132,163 @@ def insertion_sort(items):
 def merge(left, right):
     """Merge given lists of items, each assumed to already be in sorted order,
     and return a new list containing all items in sorted order.
-    TODO: Running time: ??? Why and under what conditions?
-    TODO: Memory usage: ??? Why and under what conditions?"""
-    # TODO: Repeat until one list is empty
+    ASSUMING n IS ORIGINAL LIST AND HALVES ARE (n/2)
+    Running time: O(n); has to go through every element in both lists(n/2 * 2)
+        Can be less if one list finishes first
+    Memory usage: n + m"""
+    # COMPARE default: (is [arg1] greater than [arg2])
+    # KEY default: (do nothing to element)
+    # NOTE: Please make sure that both lists are in order
     l_index = r_index = 0
     merged = []
+    # Repeat until one list is empty
     while (l_index < len(left)) and (r_index < len(right)):
+        left_item = left[l_index]
+        right_item = right[r_index]
         # If right index is larger, append left[index]; increase l. index
-        if COMPARE(KEY(right[r_index]), KEY(left[l_index])):
-            merged.append(left[l_index])
+        if COMPARE(KEY(right_item), KEY(left_item)):
+            merged.append(left_item)
             l_index += 1
         # If left index is larger, append right[index]; increase r. index
-        elif COMPARE(KEY(left[l_index]), KEY(right[r_index])):
-            merged.append(right[r_index])
+        elif COMPARE(KEY(left_item), KEY(right_item)):
+            merged.append(right_item)
             r_index += 1
-    # Add remaining merge
+        # If equal; jam em both in + increment both; no harm, no foul
+        elif(KEY(left_item) == KEY(right_item)):
+            merged.append(left_item)
+            merged.append(right_item)
+            l_index += 1
+            r_index += 1
+    # Add remains of other list via append
     if(l_index == len(left)):
-        merged.extend(right[r_index:])
-    elif(r_index == len(left)):
-        merged.extend(left[l_index:])
+        for index in range(r_index, len(right)):
+            merged.append(right[index])
+    elif(r_index == len(right)):
+        for index in range(l_index, len(left)):
+            merged.append(left[index])
     # Return list
     return merged
-
 
 def split_sort_merge(items):
     """Sort given items by splitting list into two approximately equal halves,
     sorting each with an iterative sorting algorithm, and merging results into
     a list in sorted order.
-    TODO: Running time: ??? Why and under what conditions?
-    TODO: Memory usage: ??? Why and under what conditions?"""
-    # Pivot point/middle
-    pivot = int(len(items) / 2)
+    Running time: O(n^2) technically, but much lower in practice;
+        Running cocktail twice which is O(n^2) on smaller lists is a tad better
+        Assuming 100 items worst case:
+            Cocktail: (100)^2 or 10,000
+            Split-sort: 2(50^2) => 2*2500 => 5,000 operations
+        But you pay for it in memory usage
+    Memory usage: O(n);
+        2n + merge; two halves 2(n/2) or (n) + sorted list (n)"""
+    # COMPARE default: (is [arg1] greater than [arg2])
+    # KEY default: (do nothing to element)
+
+    # Pivot point; go to middle
+    pivot = len(items) // 2
+    # Init the two halves
+    left = items[pivot:]
+    right = items[:pivot]
     # Sort each half using any other sorting algorithm
-    left = cocktail_sort(items[0:pivot])
-    right = cocktail_sort(items[pivot:len(items)])
+    cocktail_sort(left)
+    cocktail_sort(right)
     # Merging; [:] to mutate properly
     items[:] = merge(left, right)
-    return items
-
 
 def merge_sort(items):
     """Sort given items by splitting list into two approximately equal halves,
     sorting each recursively, and merging results into a list in sorted order.
-    TODO: Running time: ??? Why and under what conditions?
-    TODO: Memory usage: ??? Why and under what conditions?"""
-    # TODO: Check if list is so small it's already sorted (base case)
-    if (len(items)/2) < 2:
-        return bubble_sort(items)
-    # TODO: Split items list into approximately equal halves
-    else:
-        # Pivot point/middle
-        pivot = int(len(items) / 2)
-        # Recursive call
-        left = merge_sort(items[0:pivot])
-        right = merge_sort(items[pivot:len(items)])
-        # Merging; [:] to mutate properly
-        items[:] = merge(left, right)
-        return items
+    Running time: O(n log n)
+        Depends on how many times we can split it in half.
+        log n: With 256 items, we have to split it log(2)256 or 8 times
+        n: After splitting it, we need to do a merge each time we do this func
+        Which is why it's n * (log(2)n)
+    Memory usage: 2(n * log n)?
+        Despite splits, we still have size n each time we do an operations
+        We do splits equal to log n, and they're mirrored (merge out, merge in)
 
+        While it's 2(n * log n) + n when including the original list, we don't
+        need to deal with that.
+        """
+    # Base case
+    if (len(items)) > 1:
+        # Pivot point/middle
+        pivot = len(items) // 2
+        # Recursive calls
+        left = items[:pivot]
+        right = items[pivot:]
+        # Merging
+        merge_sort(left)
+        merge_sort(right)
+        # Merging
+        items[:] = merge(left, right)
+        # items[:] = merge2(left, right, items)
+def merge2(items, pivot, newlist):
+    """Merge given lists of items, each assumed to already be in sorted order,
+    and return a new list containing all items in sorted order.
+    ASSUMING n IS ORIGINAL LIST AND HALVES ARE (n/2)
+    Running time: O(n); has to go through every element in both lists(n/2 * 2)
+        Can be less if one list finishes first
+    Memory usage: n + m"""
+    # COMPARE default: (is [arg1] greater than [arg2])
+    # KEY default: (do nothing to element)
+    # NOTE: Please make sure that both lists are in order
+
+    # We use pivot as the end of the line for the l_index
+    l_index = items_index = 0
+    r_index = pivot
+
+    # Repeat until one list is empty
+    while (l_index < pivot) and (r_index < len(items)):
+        left_item = items[l_index]
+        right_item = items[r_index]
+        # If right index is larger, append left[index]; increase l. index
+        if COMPARE(KEY(right_item), KEY(left_item)):
+            newlist[items_index] = left_item
+            l_index += 1
+        # If left index is larger, append right[index]; increase r. index
+        elif COMPARE(KEY(left_item), KEY(right_item)):
+            newlist[items_index] = right_item
+            r_index += 1
+        # If equal; jam em both in + increment both; no harm, no foul
+        elif(KEY(left_item) == KEY(right_item)):
+            newlist[items_index] = left_item
+            items_index += 1    # Going to want to increase this
+            l_index += 1
+            newlist[items_index] = right_item
+            r_index += 1
+        # Go forward on the list
+        items_index += 1
+
+    # Add remains of other list via append
+    if(l_index == pivot):
+        for index in range(r_index, len(items)):
+            newlist[items_index] = items[index]
+            items_index += 1
+    elif(r_index == len(items)):
+        for index in range(l_index, pivot):
+            newlist[items_index] = items[index]
+            items_index += 1
+    return items
+
+def merge_sort2(items):
+    """See above merge for details; merge, but using the double buffer"""
+    # Base case
+    if (len(items)) > 1:
+        # Pivot point/middle
+        pivot = len(items) // 2
+        itemcopy = []
+        # Copy left side of list first to empty array
+        for i in range(0, pivot):
+            itemcopy.append(items[i])
+        merge_sort(itemcopy)
+
+        # Now copy the right side to replace the left side
+        for i in range(pivot, len(items)):
+            itemcopy.append(items[i])
+        merge_sort(itemcopy)
+        # Merging
+        items = merge2(itemcopy, pivot, items)
 
 def random_ints(count=20, min=1, max=50):
     """Return a list of `count` integers sampled uniformly at random from
@@ -208,9 +301,10 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
     """Test sorting algorithms with a small list of random items."""
     # Create a list of items randomly sampled from range [1...max_value]
     import random
-    # items = random.sample(range(1, max_value + 1), num_items)
+    items = random.sample(range(1, max_value + 1), num_items)
     # items = ["A", "b", "d", "E", "C"]
-    items = [('A', 1), ('B', 3), ('d', 4), ('e', 7), ('F', 9), ('C', 2)]
+    # items = [('A', 1), ('B', 3), ('d', 4), ('e', 7), ('F', 9), ('C', 2)]
+    # items = [5, 4, 3, 2, 1]
     # items = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     # item_range = list(range(1, max_value + 1))
     # items = [random.choice(item_range for _ in range(num_items))]

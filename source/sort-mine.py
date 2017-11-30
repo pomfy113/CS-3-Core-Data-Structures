@@ -71,7 +71,6 @@ class Basic_Searches(object):
         for index in range(len(array)):
             item = index
 
-
             while array[index] < array[item-1] and item > 0:
                 item -= 1
 
