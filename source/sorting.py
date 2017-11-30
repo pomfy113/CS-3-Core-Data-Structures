@@ -227,7 +227,7 @@ def merge_sort(items):
         items[:] = merge(left, right)
         # items[:] = merge2(left, right, items)
 
-def merge2(items, items_copy, start, middle, end):
+def merge2(items_input, items_output, start, middle, end):
     """Merge given lists of items, each assumed to already be in sorted order,
     and return a new list containing all items in sorted order.
     ASSUMING n IS ORIGINAL LIST AND HALVES ARE (n/2)
@@ -251,49 +251,48 @@ def merge2(items, items_copy, start, middle, end):
     index = start
 
     while (l_index < middle) and (r_index < end):
-        l_item = items[l_index]
-        r_item = items[r_index]
+        l_item = items_output[l_index]
+        r_item = items_output[r_index]
         # if the right item is larger, place left item into array
         if COMPARE(KEY(r_item), KEY(l_item)):
-            items_copy[index] = l_item
+            items_input[index] = l_item
             l_index += 1
         # if the left item is larger, place right into new array
         elif COMPARE(KEY(l_item), KEY(r_item)):
-            items_copy[index] = r_item
+            items_input[index] = r_item
             r_index += 1
         # Let's do both!
         elif KEY(r_item) == KEY(l_item):
-            items_copy[index] = l_item
+            items_input[index] = l_item
             l_index += 1
             index += 1
-            items_copy[index] = r_item
+            items_input[index] = r_item
             r_index += 1
         # Next!
         index += 1
         # Add remains of other list via append
     if(l_index == middle):
         for i in range(r_index, end):
-            items_copy[index] = items[i]
+            items_input[index] = items_output[i]
             index += 1
 
     elif(r_index == end):
         for i in range(l_index, middle):
-            items_copy[index] = items[i]
+            items_input[index] = items_output[i]
             index += 1
-
     # Updating only original copy!
-    for i in range(start, end):
-        items[i] = items_copy[i]
+    # for i in range(start, end):
+    #     items[i] = items_input[i]
 
-def merge_sort2(items, items_copy=[]):
+def merge_sort2(items, items_input=[]):
     """See above merge for details; merge, but using the double buffer."""
-    items_copy = items[:]
+    items_input = items[:]
     start = 0
     end = len(items)
     # Hookay, let's get started with this mess
-    mergehelper(items, items_copy, start, end)
+    mergehelper(items, items_input, start, end)
 
-def mergehelper(items, items_copy, start, end):
+def mergehelper(items_input, items_output, start, end):
     # We've hit the end
     if end - start < 2:
         return
@@ -301,10 +300,10 @@ def mergehelper(items, items_copy, start, end):
         # Settle the middle for future uses
         middle = (start+end) // 2
         # Recursive: give smaller and smaller lists
-        mergehelper(items, items_copy, start, middle)
-        mergehelper(items, items_copy, middle, end)
+        mergehelper(items_output, items_input, start, middle)
+        mergehelper(items_output, items_input, middle, end)
         # Time to do the merge!
-        merge2(items, items_copy, start, middle, end)
+        merge2(items_input, items_output, start, middle, end)
 
 def random_ints(count=20, min=1, max=50):
     """Return a list of `count` integers sampled uniformly at random from
