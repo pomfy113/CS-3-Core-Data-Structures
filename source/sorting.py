@@ -1,9 +1,10 @@
 #!python
 import operator
+from binarytree import BinaryTreeNode, BinarySearchTree
+
 # from pympler import tracker
 # tr = tracker.SummaryTracker()
 # Global var
-from memory_profiler import profile
 
 COMPARE = operator.gt
 KEY = eval("lambda x: x")
@@ -87,10 +88,6 @@ def cocktail_sort(items):
 def selection_sort(items):
     """Sort given items by finding minimum item, swapping it with first
     unsorted item, and repeating until all items are in sorted order."""
-    # if order == "reverse":
-    #     compare = operator.lt
-    # elif order == "normal":
-    #     compare = operator.gt
     global COMPARE
     global KEY
 
@@ -305,6 +302,36 @@ def mergehelper(items_input, items_output, start, end):
         # Time to do the merge!
         merge2(items_input, items_output, start, middle, end)
 
+def quick_sort(items):
+    """It's a quick sort!"""
+    quick_sort_helper(items, 0, len(items)-1)
+    
+import random from random
+
+def quick_sort_helper(items, start, end):
+    # Keep going until you hit 1 item left (or less!)
+    if start < end:
+        # Need to reset index to the starting position
+        index = random.randint(start, end)
+        # Loop for swapping; use final element as pivot
+        for i in range(start, end):
+            # If the item is smaller than the pivot, place it on index
+            # We use index to see where we put that pivot
+            if items[i] < items[end]:
+                items[i], items[index] = items[index], items[i]
+                index += 1
+        items[end], items[index] = items[index], items[end]
+
+        # We need to ignore the pivot, hence the -1 and +1
+        quick_sort_helper(items, start, index-1)
+        quick_sort_helper(items, index+1, end)
+
+def tree_sort(items):
+    item_tree = BinarySearchTree(items)
+    print(item_tree.items_in_order())
+    print(len(item_tree.items_in_order()), len(items))
+    items[:] = item_tree.items_in_order()
+
 def random_ints(count=20, min=1, max=50):
     """Return a list of `count` integers sampled uniformly at random from
     given range [`min`...`max`] with replacement (duplicates are allowed)."""
@@ -319,15 +346,16 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
     # items = ["A", "b", "d", "E", "C"]
     # items = [('A', 1), ('B', 3), ('d', 4), ('e', 7), ('F', 9), ('C', 2)]
     # items = [5, 4, 3, 2, 1]
+    items = [1, 5, 4, 2, 3]
     # items = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     # item_range = list(range(1, max_value + 1))
     # items = [random.choice(item_range for _ in range(num_items))]
-    # print('Initial items: {!r}'.format(items))
-    # print('Sorted order?  {!r}'.format(is_sorted(items)))
+    print('Initial items: {!r}'.format(items))
+    print('Sorted order?  {!r}'.format(is_sorted(items)))
 
     # Change this sort variable to the sorting algorithm you want to test
     # sort = bubble_sort
-    # print('Sorting items with {}(items)'.format(sort.__name__))
+    print('Sorting items with {}(items)'.format(sort.__name__))
 
     global COMPARE
     global KEY
@@ -338,7 +366,7 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
         COMPARE = operator.gt
     # Changed to make merge_sort possible
     sort(items)
-    # print('Sorted items:  {!r}'.format(items))
+    print('Sorted items:  {!r}'.format(items))
     print('Sorted order?  {!r}'.format(is_sorted(items)))
 
 def main():
