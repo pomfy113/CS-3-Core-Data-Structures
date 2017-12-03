@@ -302,29 +302,50 @@ def mergehelper(items_input, items_output, start, end):
         # Time to do the merge!
         merge2(items_input, items_output, start, middle, end)
 
+import random
+
 def quick_sort(items):
     """It's a quick sort!"""
-    quick_sort_helper(items, 0, len(items)-1)
-    
-import random from random
+    quick_sort_helper(items, 0, len(items))
 
 def quick_sort_helper(items, start, end):
     # Keep going until you hit 1 item left (or less!)
     if start < end:
         # Need to reset index to the starting position
-        index = random.randint(start, end)
+        index = start
+        pivot = pivot_finder(start, end)
         # Loop for swapping; use final element as pivot
         for i in range(start, end):
             # If the item is smaller than the pivot, place it on index
             # We use index to see where we put that pivot
-            if items[i] < items[end]:
-                items[i], items[index] = items[index], items[i]
+            if items[i] < items[pivot]:
+                if index != i:
+                    items[i], items[index] = items[index], items[i]
+                if pivot == index:
+                    pivot = i
                 index += 1
-        items[end], items[index] = items[index], items[end]
 
-        # We need to ignore the pivot, hence the -1 and +1
-        quick_sort_helper(items, start, index-1)
+        items[pivot], items[index] = items[index], items[pivot]
+        quick_sort_helper(items, start, index)
         quick_sort_helper(items, index+1, end)
+
+def pivot_finder(start, end):
+    # # 9er
+    # pivotlist = []
+    # for i in range(3):
+    #     rng = random.choices(range(start, end), k=3)
+    #     bubble_sort(rng)
+    #     pivotlist.append(rng[1])
+    # bubble_sort(pivotlist)
+    # return pivotlist[1]
+
+    # # 3er
+    # pivotlist = random.choices(range(start, end), k=3)
+    # bubble_sort(pivotlist)
+    # return pivotlist[1]
+
+    # For massive lists, this is pretty close
+    return random.randint(start, end-1)
 
 def tree_sort(items):
     item_tree = BinarySearchTree(items)
@@ -342,15 +363,16 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
     """Test sorting algorithms with a small list of random items."""
     # Create a list of items randomly sampled from range [1...max_value]
     import random
-    items = random.sample(range(1, max_value + 1), num_items)
+    items = list(range(0,100000))
+    # items = random.sample(range(1, max_value + 1), num_items)
     # items = ["A", "b", "d", "E", "C"]
     # items = [('A', 1), ('B', 3), ('d', 4), ('e', 7), ('F', 9), ('C', 2)]
     # items = [5, 4, 3, 2, 1]
-    items = [1, 5, 4, 2, 3]
+    # items = [1, 5, 4, 2, 3]
     # items = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     # item_range = list(range(1, max_value + 1))
     # items = [random.choice(item_range for _ in range(num_items))]
-    print('Initial items: {!r}'.format(items))
+    # print('Initial items: {!r}'.format(items))
     print('Sorted order?  {!r}'.format(is_sorted(items)))
 
     # Change this sort variable to the sorting algorithm you want to test
@@ -366,7 +388,7 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
         COMPARE = operator.gt
     # Changed to make merge_sort possible
     sort(items)
-    print('Sorted items:  {!r}'.format(items))
+    # print('Sorted items:  {!r}'.format(items))
     print('Sorted order?  {!r}'.format(is_sorted(items)))
 
 def main():
