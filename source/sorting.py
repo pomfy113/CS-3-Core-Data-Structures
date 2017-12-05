@@ -344,7 +344,7 @@ def pivot_finder(start, end):
     # bubble_sort(pivotlist)
     # return pivotlist[1]
 
-    # For massive lists, this is pretty close
+    # Still somehow faster than the others for massive lists of in-order lists
     return random.randint(start, end-1)
 
 def tree_sort(items):
@@ -352,6 +352,78 @@ def tree_sort(items):
     print(item_tree.items_in_order())
     print(len(item_tree.items_in_order()), len(items))
     items[:] = item_tree.items_in_order()
+
+
+def sample_sort(items):
+    """Split into bucket, then quicksort.
+    This should be the modular version"""
+    # Bucket amt. Change as needed, putting as 4.
+    # The more buckets we have, the more we fragment
+    bucket_amt = 3
+    pivot_sample_size = 3
+    # Smaller items need a gentler touch
+    if bucket_amt * pivot_sample_size >= len(items):
+        # Need that 1 to make sure we don't get zeroes
+        bucket_amt = 1 + (len(items) // 3)
+        pivot_sample_size = 1 + (len(items) // 3)
+    # Grab samples for determining splitters
+
+    # List of indexes
+    pos_pivots = []
+    # Do we want a bigger or smaller pivot sample size?
+
+    """I should REALLY make the pivot chooser into a helper function."""
+    # Grab a sample of items to choose pivots from
+    pivot_sample = pivot_sample_size * bucket_amt
+    for i in range(0, pivot_sample-1):
+        # Int instead of // because I want the floats to multiply first
+        index = int((1 + i) * (len(items) / pivot_sample))
+        pos_pivots.append((items[index], index))
+    # Sort this sample so we can find some pivots
+    quick_sort(pos_pivots)
+    # Let's pick the actual pivots; more buckets, more divisions
+    pivot_choices = []
+    for i in range(1, bucket_amt):
+        index = i * (len(pos_pivots) // (bucket_amt))
+        pivot_choices.append(pos_pivots[index][1])
+    # Time to bucket it up
+    sample_helper(items, pivot_choices, bucket_amt)
+
+
+def sample_helper(items, pivot_choices, bucket_amt):
+    """The bucket-ing."""
+    buckets = [list() for x in range(bucket_amt)]
+    # The bucketing begins
+    for item in items:
+        bucketed = False
+        # Go through all the pivots we have
+        for index, pivot in enumerate(pivot_choices):
+            # If the item is less than the pivot, put in the bucket then break
+            if item <= items[pivot]:
+                buckets[index].append(item)
+                bucketed = True
+                break
+        # If it's past the final pivot, we put it at the last bucket
+        if bucketed is False:
+            buckets[len(buckets)-1].append(item)
+
+    # I couldn't decide between the two
+    # This one flattens the bucket and then making everything in items into it
+    # # buckets_contents = []
+    # for bucket in buckets:
+    #     quick_sort(bucket)
+    #     items.extend(bucket)
+    #     # bucket_content.extend(bucket)
+    #
+    # items[:] = [item for sublist in buckets for item in sublist]
+
+    # This one empties items, then extends items constantly with the bucket
+    items[:] = []
+    for bucket in buckets:
+        quick_sort(bucket)
+        items.extend(bucket)
+
+
 
 def random_ints(count=20, min=1, max=50):
     """Return a list of `count` integers sampled uniformly at random from
@@ -363,13 +435,16 @@ def test_sorting(order, key, sort=bubble_sort, num_items=20, max_value=50):
     """Test sorting algorithms with a small list of random items."""
     # Create a list of items randomly sampled from range [1...max_value]
     import random
-    items = list(range(0,100000))
+    # items = list(range(0,100000))
     # items = random.sample(range(1, max_value + 1), num_items)
+    # items = [7, 5, 3, 7, 5, 7, 5, 3, 7]
+
     # items = ["A", "b", "d", "E", "C"]
     # items = [('A', 1), ('B', 3), ('d', 4), ('e', 7), ('F', 9), ('C', 2)]
     # items = [5, 4, 3, 2, 1]
     # items = [1, 5, 4, 2, 3]
-    # items = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    # items = [10, 9, 8, 7, 6, 5, 4, 3, 2]
+    items = [1]
     # item_range = list(range(1, max_value + 1))
     # items = [random.choice(item_range for _ in range(num_items))]
     # print('Initial items: {!r}'.format(items))
